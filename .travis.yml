@@ -54,12 +54,3 @@ jobs:
         - cd ../predicting-refactoring-ml/data-collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
       script: mvn -f pom.xml -Dtest=integration.canaryprojects.TelegramServerIntegrationTest test
-
-    - name: "Test machine-learning - Machine-Learning: Python"
-      language: python
-      python: "3.7"
-      before_install:
-        - cd ../predicting-refactoring-ml/machine-learning/
-        - python -m pip install --upgrade pip
-        - python -m pip install --upgrade pytest
-      script: pytest
