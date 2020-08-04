@@ -1,7 +1,7 @@
 FROM openjdk:11
-VOLUME /data-collection
+VOLUME /Data-Collection
 VOLUME /storage
-WORKDIR /data-collection
+WORKDIR /Data-Collection
 
 ENTRYPOINT ["sh", "run-cloud.sh"]
 CMD []
