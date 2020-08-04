@@ -22,7 +22,7 @@ services:
   import:
     build: .
     volumes:
-      - .:/data-collection
+      - .:/Data-Collection
     environment:
       - TASK=import
       - FILE_TO_IMPORT=${FILE_TO_IMPORT:-projects-final.csv}
@@ -34,7 +34,7 @@ services:
   worker:
     build: .
     volumes:
-      - .:/data-collection
+      - .:/Data-Collection
       - ./volumes/storage:/storage
     environment:
       - TASK=worker
