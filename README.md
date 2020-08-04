@@ -1,14 +1,11 @@
 # Machine Learning for Software refactoring
 [![Build Status](https://travis-ci.org/refactoring-ai/predicting-refactoring-ml.svg?branch=master)](https://travis-ci.org/refactoring-ai/predicting-refactoring-ml)
 
-This repository contains the data collection part on the use
-of machine learning methods to recommend software refactoring.
+This repository contains the data-collection part on the use of machine learning methods to recommend software refactoring.
 
 It currently contains the following projects:
 
-* `data-collection`: The java tool that collects refactoring and non-refactorings instances that are later used to train the ML algorithms. A docker script is available.
-
-* `machine-learning`: The python scripts that train the different ML algorithms.
+* `data-collection`: The java tool that collects **refactoring** and **non-refactoring** instances from **java source code** that are later used to **train** the ML algorithms with a large variety of metrics.
 
 ## Paper and appendix 
 
@@ -16,8 +13,17 @@ It currently contains the following projects:
 * The raw dataset can be found here: https://zenodo.org/record/3547639
 * The appendix with our full results can be found here: https://zenodo.org/record/3583980 
 
-
 ## The data collection tool
+
+### Dependencies
+
+* Java 11, or higher
+* Maven
+
+**Optional**
+
+* [Docker](https://docs.docker.com/engine/install/)
+* [Docker-compose](https://docs.docker.com/compose/install/)
 
 ### Compiling the tool
 
@@ -26,6 +32,35 @@ Use Maven: `mvn clean compile`. Or just import it via IntelliJ; it will know wha
 If you want to export a jar file and run it somewhere else, just do `mvn clean package`. A .jar file will be created under the `target/` folder. You can use this jar to run the tool manually.
 
 To run the tests please run a local mariaDB database instance, for details see `src/main/test/java/integration/DataBaseInfor for details`.
+
+## Running via Docker
+
+The **recommend** **way** to use this tool. 
+
+The data collection tool can be executed via Docker containers. It should be as easy as:
+
+1. Clone the project: `git clone https://github.com/refactoring-ai/Data-Collection.git`
+2. Build the project: `mvn clean package -DskipTests`
+3. Move the built jar with dependencies from target dir into the lib dir: `mv target/data-collection-0.0.1-SNAPSHOT-jar-with-dependencies.jar lib/`
+4. Run the data-collection: `sudo ./run-data-collection.sh projects/projects-final.csv 4`
+
+**Configurations** can be done with the following **arguments**:
+
+ 1. [FILE_TO_IMPORT] - Csv file with all projects, see projects dir for examples.
+ 1. [Worker_Count] - Number of concurrent workers for the data collection, executing the `RunQueue` class.
+
+ * **Optional**: 
+   1. [DB_URL] - fully qualified url to a custom database, e.g. `jdbc:mysql://db:3306/refactoringdb`
+   1. [DB_USER] - user name for the custom database
+   1. [DB_PWD] - password for the custom database
+
+* The default database is a containerized MySQL database (mariaDB), y can directly access it via localhost:3308, root, refactoringdb. You can change it in `docker-compose_db.yml->db` and `docker-compose.yml->worker->environment->REF_URL`, `REF_USER`, and `REF_PWD`.
+* The default MySQL database, the RabbitMQ queue, and the source code are all stored in the `data-collection/volumes` folder. Feel free to change where the volumes are stored.
+* The configurations of the workers (basically the same as defined in the manual execution) can be defined in `docker-compose.yml->worker->environment`.
+* `http://localhost:15672` takes you to the RabbitMQ admin (user: guest, pwd:guest) and `localhost:8080` takes you to adminer, a simple DB interface.
+  Feel free to start as many workers as you want and/or your infrastructure enables you!
+
+_Tip:_ If you are restarting everything, make sure to not import the projects again. Otherwise, you will have duplicated entries. Simply leave the file name blank in `import -> environment -> FILE_TO_IMPORT`.
 
 ### Running in a manual way
 
@@ -50,44 +85,6 @@ Example:
 
 ```
 java -jar refactoring.jar <dataset> <git-url> <output-path> <database-url> <database-user> <database-password> <k-threshold>
-```
-
-### Running via Docker
-
-The data collection tool can be executed via Docker containers. It should be as easy as:
-
-```
-git clone https://github.com/mauricioaniche/predicting-refactoring-ml.git
-cd predicting-refactoring-ml
-sudo ./run-data-collection.sh projects-final.csv 4
-```
-
-Configurations can be done with the following **arguments**:
- 1. [FILE_TO_IMPORT] - Csv file with all projects
- 1. [Worker_Count] - Number of concurrent worker for the data collection, running the `RunQueue` class
- * **Optional**: 
-     1. [DB_URL] - fully qualified url to a custom database, e.g. `jdbc:mysql://db:3306/refactoringdb`
-     1. [DB_USER] - user name for the custom database
-     1. [DB_PWD] - password for the custom database
-
-* The default database is a containerized MySQL database (mariaDB), y can directly access it via localhost:3308, root, refactoringdb. You can change it in `docker-compose_db.yml->db` and `docker-compose.yml->worker->environment->REF_URL`, `REF_USER`, and `REF_PWD`.
-* The default MySQL database, the RabbitMQ queue, and the source code are all stored in the `data-collection/volumes` folder. Feel free to change where the volumes are stored.
-* The configurations of the workers (basically the same as defined in the manual execution) can be defined in `docker-compose.yml->worker->environment`.
-* `http://localhost:15672` takes you to the RabbitMQ admin (user: guest, pwd:guest) and `localhost:8080` takes you to adminer, a simple DB interface.
-Feel free to start as many workers as you want and/or your infrastructure enables you!
-
-_Tip:_ If you are restarting everything, make sure to not import the projects again. Otherwise, you will have duplicated entries. Simply leave the file name blank in `import -> environment -> FILE_TO_IMPORT`.
-
-### Cleaning up the final database
-
-When running in scale, e.g., in thousands of projects, some projects might fail due to e.g., AST parser failure. Although the app tries to remove problematic rows, if the process dies completely (e.g., maybe out of memory in your machine), partially processed projects will be in the database. 
-
-We use the following queries to remove half-baked projects completely from our database:
-
-```
-delete from RefactoringCommit where project_id in (select id from project where finishedDate is null);
-delete from StableCommit where project_id in (select id from project where finishedDate is null);
-delete from project where finishedDate is null;
 ```
 
 ## Authors
