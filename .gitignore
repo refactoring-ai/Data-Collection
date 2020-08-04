@@ -9,15 +9,16 @@
 ~          
 */repos/
 */logs*/
-data-collection/storage/
+storage/
 
 .DS_Store
 .Python
 [Bb]in
 [Ii]nclude
-[Ll]ib
 [Ll]ib64
 [Ll]ocal
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+*.log
+.factorypath
