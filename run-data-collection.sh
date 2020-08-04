@@ -1,7 +1,6 @@
 #! /bin/bash
 
 #configuration
-dir="data-collection"
 logDir="logs/"
 terminalLog="docker-terminal.log"
 
@@ -21,7 +20,6 @@ else
 fi
 
 #prepare data-collection
-cd data-collection
 mkdir -p $logDir
 
 #build the project
