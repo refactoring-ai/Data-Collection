@@ -1,12 +1,11 @@
-mysql/*
 .settings
+
 *.iml
 .idea/
 .DS_Store
 /target/
 .classpath
 .project
-
 ~          
 */repos/
 */logs*/
@@ -16,6 +15,7 @@ data-collection/storage/
 .Python
 [Bb]in
 [Ii]nclude
+[Ll]ib
 [Ll]ib64
 [Ll]ocal
 pyvenv.cfg
