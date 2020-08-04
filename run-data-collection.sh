@@ -25,8 +25,8 @@ mkdir -p $logDir
 echo "Start docker-compose..."
 #optional maria db, e.g. for tests, the output is saved in the volumes/mysql folder
 if [ $# -eq 2 ]; then	
-	sudo docker-compose -f docker-compose.yml -f docker-compose_db.yml up --scale worker=$Worker_Count |&tee -a "${logDir}${terminalLog}"
+	docker-compose -f docker-compose.yml -f docker-compose_db.yml up --scale worker=$Worker_Count |&tee -a "${logDir}${terminalLog}"
 #custom db
 elif [ $# -eq 5 ]; then
-	sudo docker-compose up --scale worker=$Worker_Count |&tee -a "${logDir}${terminalLog}"
+	docker-compose up --scale worker=$Worker_Count |&tee -a "${logDir}${terminalLog}"
 fi

@@ -7,8 +7,8 @@
 .classpath
 .project
 ~          
-*/repos/
-*/logs*/
+**/repos/
+**/logs*/
 storage/
 
 .DS_Store
@@ -22,3 +22,5 @@ pyvenv.cfg
 pip-selfcheck.json
 *.log
 .factorypath
+
+**/mysql/*
