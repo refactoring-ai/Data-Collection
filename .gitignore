@@ -7,17 +7,20 @@
 .classpath
 .project
 ~          
-*/repos/
-*/logs*/
-data-collection/storage/
+**/repos/
+**/logs*/
+storage/
 
 .DS_Store
 .Python
 [Bb]in
 [Ii]nclude
-[Ll]ib
 [Ll]ib64
 [Ll]ocal
 pyvenv.cfg
 .venv
 pip-selfcheck.json
+*.log
+.factorypath
+
+**/mysql/*
