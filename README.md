@@ -89,7 +89,7 @@ java -jar refactoring.jar <dataset> <git-url> <output-path> <database-url> <data
 
 ## Database Clean-up
 
-The enormous variety refactoring types, projects and programming styles in the mined repositories can lead to various issues with the data. Therefore, we explain to common problems and potential solutions here.
+The enormous variety refactoring types, projects and programming styles in the mined repositories can lead to various issues with the data. Therefore, we explain two common problems and potential solutions here.
 
 **!MAKE A COPY OF YOUR DATA BEFORE ALTERING IT!**
 
