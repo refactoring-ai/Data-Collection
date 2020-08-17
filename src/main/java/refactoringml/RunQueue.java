@@ -42,7 +42,7 @@ public class RunQueue {
 		failedProjectsFile = new File(enforceUnixPaths(PropertiesUtils.getProperty("failedProjectsFile") + "_" + containerName));
 		failedProjectsFile.getParentFile().mkdirs();
 
-		db = new Database(new HibernateConfig().getSessionFactory(url, user, pwd));
+		db = new Database(HibernateConfig.getSessionFactory(url, user, pwd));
 		log.debug(toString());
 	}
 

@@ -42,7 +42,7 @@ public class DatabaseProjectTest{
         outputDir = createTmpDir();
         tmpDir = createTmpDir();
 
-        sf = new HibernateConfig().getSessionFactory(URL, USER, PASSWORD, false);
+        sf = HibernateConfig.getSessionFactory(URL, USER, PASSWORD, false);
         db = new Database(sf);
     }
 
