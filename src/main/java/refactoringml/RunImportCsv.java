@@ -87,7 +87,6 @@ public class RunImportCsv {
 	}
 
 	private void run(Args args, String repoLocation) throws InterruptedException, IOException {
-
 		ThreadPoolExecutor tp = (ThreadPoolExecutor) Executors.newFixedThreadPool(args.runWithCores);
 		tp.setCorePoolSize(args.runWithCores);
 		SessionFactory sf = HibernateConfig.getSessionFactory(args.databaseHost, Optional.ofNullable(args.databasePort),
@@ -97,7 +96,7 @@ public class RunImportCsv {
 			try (Stream<String> stream = Files.lines(Paths.get(args.inputCsvFile))) {
 				List<RepoProcesser> tasks = stream.map(line -> new RepoProcesser(repoLocation, args.storeSourceCode,
 						new Database(sf.openSession()), line)).collect(Collectors.toList());
-				tp.invokeAll(tasks, 100, TimeUnit.HOURS);
+				tp.invokeAll(tasks);
 			}
 			tp.shutdown();
 		} finally {
