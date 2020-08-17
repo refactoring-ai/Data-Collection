@@ -1,6 +1,28 @@
 package refactoringml;
 
+import static refactoringml.util.CKUtils.cleanCkClassName;
+import static refactoringml.util.CKUtils.extractClassMetrics;
+import static refactoringml.util.CKUtils.extractMethodMetrics;
+import static refactoringml.util.FilePathUtils.enforceUnixPaths;
+import static refactoringml.util.FileUtils.cleanTempDir;
+import static refactoringml.util.FileUtils.createTmpDir;
+import static refactoringml.util.FileUtils.writeFile;
+import static refactoringml.util.JGitUtils.getDiffFormater;
+import static refactoringml.util.JGitUtils.readFileFromGit;
+import static refactoringml.util.LogUtils.createErrorState;
+import static refactoringml.util.RefactoringUtils.calculateLinesAdded;
+import static refactoringml.util.RefactoringUtils.calculateLinesDeleted;
+
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import com.github.mauricioaniche.ck.CKMethodResult;
+
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -8,19 +30,22 @@ import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import refactoringml.db.*;
-import refactoringml.util.*;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
-import static refactoringml.util.CKUtils.cleanCkClassName;
-import static refactoringml.util.FilePathUtils.enforceUnixPaths;
-import static refactoringml.util.CKUtils.*;
-import static refactoringml.util.FileUtils.*;
-import static refactoringml.util.JGitUtils.getDiffFormater;
-import static refactoringml.util.JGitUtils.readFileFromGit;
-import static refactoringml.util.LogUtils.createErrorState;
-import static refactoringml.util.RefactoringUtils.*;
+
+import refactoringml.db.ClassMetric;
+import refactoringml.db.CommitMetaData;
+import refactoringml.db.Database;
+import refactoringml.db.FieldMetric;
+import refactoringml.db.MethodMetric;
+import refactoringml.db.ProcessMetrics;
+import refactoringml.db.Project;
+import refactoringml.db.RefactoringCommit;
+import refactoringml.db.StableCommit;
+import refactoringml.db.VariableMetric;
+import refactoringml.util.CKUtils;
+import refactoringml.util.FilePathUtils;
+import refactoringml.util.LogUtils;
+import refactoringml.util.RefactoringUtils;
+import refactoringml.util.RefactoringUtils.Level;
 
 public class ProcessMetricsCollector {
 	private Project project;
@@ -60,7 +85,7 @@ public class ProcessMetricsCollector {
 			ProcessMetrics dbProcessMetrics  = currentProcessMetricsTracker != null ?
 					new ProcessMetrics(currentProcessMetricsTracker.getCurrentProcessMetrics()) :
 					new ProcessMetrics(0, 0, 0, 0, 0);
-
+			
 			refactoringCommit.setProcessMetrics(dbProcessMetrics);
 			db.update(refactoringCommit);
 
@@ -150,6 +175,7 @@ public class ProcessMetricsCollector {
 	//Store the refactoring instances in the DB
 	private void outputNonRefactoredClass (ProcessMetricTracker pmTracker) throws IOException {
 		String tempDir = null;
+		Collection<Object> toRemoveOnException = new ArrayList<>();
 		try {
 			String commitBackThen = pmTracker.getBaseCommitMetaData().getCommitId();
 			log.debug("Class " + pmTracker.getFileName() + " is an example of a not refactored instance with the stable commit: " + commitBackThen);
@@ -164,8 +190,11 @@ public class ProcessMetricsCollector {
 			// ... as well as in the temp one, so that we can calculate the CK metrics
 			writeFile(tempDir + pmTracker.getFileName(), sourceCodeBackThen);
 
-			if(pmTracker.getBaseCommitMetaData().getId() == 0)
-				db.persist(pmTracker.getBaseCommitMetaData());
+			if(pmTracker.getBaseCommitMetaData().getId() == 0) {
+				CommitMetaData toSave = pmTracker.getBaseCommitMetaData();
+				db.save(toSave);
+				toRemoveOnException.add(toSave);
+			}
 
 			CommitMetaData commitMetaData = db.loadCommitMetaData(pmTracker.getBaseCommitMetaData().getId());
 			List<StableCommit> stableCommits = codeMetrics(commitMetaData, tempDir, pmTracker.getCommitCountThreshold());
@@ -174,9 +203,11 @@ public class ProcessMetricsCollector {
 			// note that we print the process metrics back then (X commits ago)
 			for(StableCommit stableCommit : stableCommits) {
 				stableCommit.setProcessMetrics(new ProcessMetrics(pmTracker.getBaseProcessMetrics()));
-				db.persist(stableCommit);
+				db.save(stableCommit);
+				toRemoveOnException.add(stableCommit);
 			}
 		} catch(Exception e) {
+			toRemoveOnException.forEach(db::deleteWithoutThrowingOnException);
 			log.error(e.getClass().getCanonicalName() + " while processing stable process metrics." + createErrorState(pmTracker.getBaseCommitMetaData().getCommitId(), project), e);
 		} finally {
 			cleanTempDir(tempDir);

@@ -1,6 +1,5 @@
 package integration;
 
-import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -35,28 +34,24 @@ public class DatabaseProjectTest{
 
     private Database db;
     private SessionFactory sf;
-    private Session session;
 
     @BeforeAll
     private void initTests() throws InterruptedException {
         outputDir = createTmpDir();
         tmpDir = createTmpDir();
 
-        sf = new HibernateConfig().getSessionFactory(URL, USER, PASSWORD, false);
-        db = new Database(sf);
+        sf = HibernateConfig.getSessionFactory(URL, USER, PASSWORD, false);
     }
 
     @BeforeEach
     void openSession() {
-        session = sf.openSession();
+        db = new Database(sf.openSession());
     }
 
     @AfterEach
     void resetTests() {
         deleteProject(repo1);
         deleteProject(repo2);
-        this.session.close();
-        this.session = null;
     }
 
     @AfterAll
