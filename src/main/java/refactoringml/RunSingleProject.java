@@ -66,5 +66,6 @@ public class RunSingleProject {
 	
 
 		new App(datasetName, gitUrl, storagePath, db, storeFullSourceCode).run();
+
 	}
 }
