@@ -1,22 +1,6 @@
 package refactoringml;
 
-import static refactoringml.util.FilePathUtils.enforceUnixPaths;
-import static refactoringml.util.FileUtils.appendToFile;
-import static refactoringml.util.FileUtils.cleanOldTempDir;
-import static refactoringml.util.FileUtils.removeFromFile;
-import static refactoringml.util.PropertiesUtils.getProperty;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.concurrent.TimeoutException;
-
-import com.rabbitmq.client.AMQP;
-import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
-import com.rabbitmq.client.GetResponse;
-
+import com.rabbitmq.client.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.docker.DockerLookup;
@@ -25,19 +9,25 @@ import org.hibernate.SessionFactory;
 import refactoringml.db.Database;
 import refactoringml.db.HibernateConfig;
 import refactoringml.util.PropertiesUtils;
+import java.io.File;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.concurrent.TimeoutException;
+import static refactoringml.util.FilePathUtils.enforceUnixPaths;
+import static refactoringml.util.FileUtils.*;
+import static refactoringml.util.PropertiesUtils.getProperty;
 
 public class RunQueue {
 	private static final Logger log = LogManager.getLogger(RunQueue.class);
-	// total count of queue failures during this run, e.g. a redelivery of a already
-	// delivered message or an empty message
+	//total count of queue failures during this run, e.g. a redelivery of a already delivered message or an empty message
 	private static int queueFailures = 0;
-	// name of the docker container if any exists, otherwise null
+	//name of the docker container if any exists, otherwise null
 	private String containerName;
-	// Store all failed projects of this worker in this file
+	//Store all failed projects of this worker in this file
 	private File failedProjectsFile;
 
-	private final SessionFactory sf;
 	public final static String QUEUE_NAME = "refactoring";
+	private final SessionFactory sf;
 	private String storagePath;
 	private String host;
 	private final boolean storeFullSourceCode;
@@ -49,11 +39,11 @@ public class RunQueue {
 
 		DockerLookup dockerLookup = new DockerLookup();
 		containerName = enforceUnixPaths(dockerLookup.lookup(null, "containerName")).replace("/", "");
-		if (containerName == null)
+		if(containerName == null)
 			containerName = "null";
-		failedProjectsFile = new File(
-				enforceUnixPaths(PropertiesUtils.getProperty("failedProjectsFile") + "_" + containerName));
+		failedProjectsFile = new File(enforceUnixPaths(PropertiesUtils.getProperty("failedProjectsFile") + "_" + containerName));
 		failedProjectsFile.getParentFile().mkdirs();
+
 		sf = HibernateConfig.getSessionFactory(url, user, pwd);
 		log.debug(toString());
 	}
@@ -77,9 +67,10 @@ public class RunQueue {
 		ConnectionFactory factory = new ConnectionFactory();
 		factory.setHost(host);
 
-		while (true) {
+		while(true) {
 			log.debug("Fetching a new element from the rabbitmq queue...");
-			try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
+			try (Connection connection = factory.newConnection();
+				 Channel channel = connection.createChannel()) {
 
 				GetResponse chResponse = channel.basicGet(QUEUE_NAME, true);
 				processResponse(chResponse, channel);
@@ -98,17 +89,17 @@ public class RunQueue {
 	}
 
 	private void handleQueueError(GetResponse chResponse, Channel channel) throws InterruptedException, IOException {
-		// exit the programme if the queue is empty, all projects were processed.
+		//exit the programme if the queue is empty, all projects were processed.
 		AMQP.Queue.DeclareOk status = channel.queueDeclare(QUEUE_NAME, true, false, false, null);
-		if (status != null && status.getMessageCount() == 0) {
+		if(status != null && status.getMessageCount() == 0){
 			shutdown(channel);
 		}
 
 		queueFailures++;
-		if (queueFailures > 50)
+		if(queueFailures > 50)
 			shutdown(channel);
 
-		if (chResponse != null && chResponse.getEnvelope().isRedeliver()) {
+		if(chResponse != null && chResponse.getEnvelope().isRedeliver()) {
 			log.error("Got a redelivery from the queue: " + Arrays.toString(chResponse.getBody()));
 		} else {
 			log.error("Got an empty response from the queue: " + QUEUE_NAME + " and chResponse = " + chResponse);
@@ -116,15 +107,15 @@ public class RunQueue {
 		Thread.sleep(1000 * queueFailures);
 	}
 
-	// properly shutdown the worker with the given exitcode
-	// Only use for intentional shutdowns
+	//properly shutdown the worker with the given exitcode
+	//Only use for intentional shutdowns
 	private void shutdown(Channel channel) throws IOException {
-		// shutdown the connection with the rabbit queue
+		//shutdown the connection with the rabbit queue
 		if (channel != null && channel.isOpen())
 			channel.getConnection().close();
-		// shutdown the connection with the MYSQL database
-		// end the worker
+		//shutdown the connection with the MYSQL database
 		sf.close();
+		//end the worker
 		System.exit(0);
 	}
 
@@ -138,7 +129,7 @@ public class RunQueue {
 		appendToFile(failedProjectsFile, projectInfo + "\n");
 		try {
 			new App(dataset, gitUrl, storagePath, new Database(sf.openSession()), storeFullSourceCode).run();
-		} catch (org.eclipse.jgit.api.errors.TransportException te) {
+		} catch (org.eclipse.jgit.api.errors.TransportException te){
 			storeFailedProject(gitUrl, "Repository not available", te);
 		} catch (Exception e) {
 			log.fatal(e.getClass().getCanonicalName() + " while processing " + gitUrl, e);
@@ -148,15 +139,19 @@ public class RunQueue {
 	}
 
 	private void storeFailedProject(String gitUrl, String failureReason, Exception exception) throws IOException {
-		String failedProject = gitUrl + ", " + failureReason + ", " + exception.toString() + "\n";
+		String failedProject = gitUrl + ", " + failureReason + ", " + exception.toString()  + "\n";
 		appendToFile(failedProjectsFile, failedProject);
 	}
 
 	@Override
-	public String toString() {
-		return "RunQueue{\n" + "QUEUE_NAME = " + QUEUE_NAME + "\n" + "containerName=" + containerName + "\n"
-				+ "failedProjectsFile=" + failedProjectsFile.getAbsolutePath() + "\n" + "host = " + host + "\n"
-				+ "storagePath = " + storagePath + "\n" + "storeFullSourceCode = " + storeFullSourceCode + "sf = "
-				+ sf.toString() + "}";
+	public String toString(){
+		return "RunQueue{\n"+
+				"QUEUE_NAME = " + QUEUE_NAME + "\n" +
+				"containerName=" + containerName + "\n" +
+				"failedProjectsFile=" + failedProjectsFile.getAbsolutePath() + "\n" +
+				"host = " + host + "\n" +
+				"storagePath = " + storagePath + "\n" +
+				"storeFullSourceCode = " + storeFullSourceCode +
+				"sf = " + sf.toString() + "}";
 	}
 }

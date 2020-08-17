@@ -27,25 +27,31 @@ public class Database {
 		return session.beginTransaction();
 	}
 
-	public void save(Object obj) {
-		session.save(obj);
+	public void persist(Object obj) {
+		session.persist(obj);
 	}
 
-	public void update(Object obj) {
-		session.update(obj);
+	public <T> T merge(T toMerge) {
+		return (T) session.merge(toMerge);
 	}
 
-	public void deleteWithoutThrowingOnException(Object obj) {
-		try {
-			session.delete(obj);
-		} catch (Exception e) {
-			log.error("Could not delete {}", obj);
-		}
+	public void persistComplete(Object toPersist) {
+		Transaction t = beginTransaction();
+		persist(toPersist);
+		t.commit();
+	}
+
+	public <T> T mergeComplete(T toMerge) {
+		Transaction t = beginTransaction();
+		T merged = merge(toMerge);
+		t.commit();
+		return merged;
+
 	}
 
 	public boolean projectExists(String gitUrl) {
-		return !session.createQuery("from Project p where p.gitUrl = :gitUrl").setParameter("gitUrl", gitUrl)
-		.list().isEmpty();
+		return !session.createQuery("from Project p where p.gitUrl = :gitUrl").setParameter("gitUrl", gitUrl).list()
+				.isEmpty();
 	}
 
 	public long findAllRefactoringCommits(long projectId) {

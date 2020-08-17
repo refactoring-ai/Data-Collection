@@ -24,8 +24,8 @@ public class RunSingleProject {
 		String pwd;
 		boolean storeFullSourceCode;
 
-		if (test) {
-			// TODO: remove references to mauricios desktop, e.g. make them arguments
+		if(test) {
+			//TODO: remove references to mauricios desktop, e.g. make them arguments
 			gitUrl = "/Users/mauricioaniche/Desktop/commons-lang";
 			storagePath = "/Users/mauricioaniche/Desktop/results/";
 			datasetName = "test";
@@ -37,8 +37,7 @@ public class RunSingleProject {
 
 		} else {
 			if (args == null || args.length != 7) {
-				System.out.println(
-						"7 arguments: (dataset name) (git url or project directory) (output path) (database url) (database user) (database pwd) (true|false: store full source code?)");
+				System.out.println("7 arguments: (dataset name) (git url or project directory) (output path) (database url) (database user) (database pwd) (true|false: store full source code?)");
 				System.exit(-1);
 			}
 
@@ -46,8 +45,7 @@ public class RunSingleProject {
 			gitUrl = args[1].trim();
 			storagePath = lastSlashDir(args[2].trim());
 
-			// TODO: is this extension necessary? it is inconsistent with the url handling
-			// in RunQueue
+			//TODO: is this extension necessary? it is inconsistent with the url handling in RunQueue
 			url = args[3] + "?useSSL=false&useLegacyDatetimeCode=false&serverTimezone=UTC"; // our servers config.
 			user = args[4];
 			pwd = args[5];
@@ -59,11 +57,14 @@ public class RunSingleProject {
 
 		Database db = null;
 		try (SessionFactory sf = HibernateConfig.getSessionFactory(url, user, pwd)) {
-			db = new Database(sf.openSession());
-			new App(datasetName, gitUrl, storagePath, db, storeFullSourceCode).run();
-		} catch (Exception e) {
-			log.error("Error when connecting to the Database: ", e);
+			try {
+				db = new Database(sf.openSession());
+			} catch(Exception e) {
+				log.error("Error when connecting to the Database: ", e);
+			}
 		}
+	
 
+		new App(datasetName, gitUrl, storagePath, db, storeFullSourceCode).run();
 	}
 }
