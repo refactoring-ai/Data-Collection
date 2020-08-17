@@ -14,7 +14,6 @@ import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -89,20 +88,17 @@ public class RunImportCsv {
 	private void run(Args args, String repoLocation) throws InterruptedException, IOException {
 		ThreadPoolExecutor tp = (ThreadPoolExecutor) Executors.newFixedThreadPool(args.runWithCores);
 		tp.setCorePoolSize(args.runWithCores);
-		SessionFactory sf = HibernateConfig.getSessionFactory(args.databaseHost, Optional.ofNullable(args.databasePort),
-				args.databaseName, args.databaseUser, args.databasePassword, args.hbm2ddlStrategy,
-				DatabaseEngine.valueOf(args.databaseEngine), ConnectionPoolType.valueOf(args.connectionPoolType));
-		try {
+		try (SessionFactory sf = HibernateConfig.getSessionFactory(args.databaseHost,
+				Optional.ofNullable(args.databasePort), args.databaseName, args.databaseUser, args.databasePassword,
+				args.hbm2ddlStrategy, DatabaseEngine.valueOf(args.databaseEngine),
+				ConnectionPoolType.valueOf(args.connectionPoolType))) {
 			try (Stream<String> stream = Files.lines(Paths.get(args.inputCsvFile))) {
 				List<RepoProcesser> tasks = stream.map(line -> new RepoProcesser(repoLocation, args.storeSourceCode,
 						new Database(sf.openSession()), line)).collect(Collectors.toList());
 				tp.invokeAll(tasks);
 			}
 			tp.shutdown();
-		} finally {
-			sf.close();
 		}
-
 	}
 
 	private static class RepoProcesser implements Callable<Void> {
