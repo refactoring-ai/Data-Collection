@@ -5,7 +5,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.refactoringminer.util.GitServiceImpl;
 import refactoringml.App;
@@ -56,8 +58,7 @@ public abstract class IntegrationBaseTest {
 	 */
 	@BeforeAll
 	protected void runApp() throws Exception {
-		sf = new HibernateConfig().getSessionFactory(DataBaseInfo.URL, DataBaseInfo.USER, DataBaseInfo.PASSWORD, drop());
-		db = new Database(sf);
+		sf = HibernateConfig.getSessionFactory(DataBaseInfo.URL, DataBaseInfo.USER, DataBaseInfo.PASSWORD, drop());
 		outputDir = createTmpDir();
 		tmpDir = createTmpDir();
 
@@ -75,7 +76,7 @@ public abstract class IntegrationBaseTest {
 		App app = new App("integration-test-dataset",
 				repoLocalDir,
 				outputDir,
-				db,
+				new Database(sf.openSession()),
 				getFirstCommit(),
 				getLastCommit(),
 				storeSourceCode());
@@ -83,9 +84,19 @@ public abstract class IntegrationBaseTest {
 		project = app.run();
 	}
 
+	@BeforeEach
+	protected void beforeEach() {
+		db = new Database(sf.openSession());
+	}
+
+	@AfterEach
+	protected void afterEach() {
+		db.close();
+	}
+
 	@AfterAll
 	protected void afterApp() throws IOException {
-		db.close();
+		// db.close();
 		FileUtils.deleteDirectory(new File(tmpDir));
 		FileUtils.deleteDirectory(new File(outputDir));
 	}
