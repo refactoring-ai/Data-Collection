@@ -1,8 +1,8 @@
 language: java
 os: linux
-dist: bionic
+dist: focal
 addons:
-  mariadb: '10.4'
+  mariadb: '10.5'
 git:
   depth: 1
   quiet: true
@@ -14,28 +14,28 @@ jobs:
   include:
     - stage: Test
       name: "Test refactoringml - Data-Collection: Java"
-      jdk: oraclejdk11
+      jdk: openjdk11
       install:
         - cd ../Data-Collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
       script: mvn -f pom.xml -Dtest=refactoringml.*Test test
 
     - name: "Test Integration Toyproject - Data-Collection: Java"
-      jdk: oraclejdk11
+      jdk: openjdk11
       install:
         - cd ../Data-Collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
       script: mvn -f pom.xml -Dtest=integration.toyprojects.*Test test
 
     - name: "Test Integration Realproject ApacheCommonsCli - Data-Collection: Java"
-      jdk: oraclejdk11
+      jdk: openjdk11
       install:
         - cd ../Data-Collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
       script: mvn -f pom.xml -Dtest=integration.realprojects.ApacheCommonsCli*Test test
 
     - name: "Test Integration Realproject ApacheCommonsCSV - Data-Collection: Java"
-      jdk: oraclejdk11
+      jdk: openjdk11
       install:
         - cd ../Data-Collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
@@ -54,3 +54,6 @@ jobs:
         - cd ../Data-Collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
       script: mvn -f pom.xml -Dtest=integration.canaryprojects.TelegramServerIntegrationTest test
+      
+after_success:
+  - bash <(curl -s https://codecov.io/bash)
