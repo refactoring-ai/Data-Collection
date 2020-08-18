@@ -76,7 +76,7 @@ public class Database {
 	}
 
 	// safely rollback a transaction with the db
-	public void rollback(String logExtension) {
+	public void rollback(Transaction t,String logExtension) {
 		// this session object itself should never be null, thus we don't check for it
 		// nothing to do in this case, recovering the session or transaction is to much
 		// effort and the db takes care of a failed transaction
@@ -98,7 +98,7 @@ public class Database {
 		// standard case for a rollback
 		if (session.isConnected() && session.getTransaction() != null) {
 			try {
-				session.getTransaction().rollback();
+				t.rollback();
 			} catch (TransactionException e) {
 				log.error("Failed to rollback session: " + session.toString() + logExtension, e);
 			}
