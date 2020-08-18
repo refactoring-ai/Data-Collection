@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import refactoringml.db.RefactoringCommit;
 
+import java.util.stream.Collectors;
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class R1ToyProjectTest extends IntegrationBaseTest {
 
@@ -40,6 +42,7 @@ public class R1ToyProjectTest extends IntegrationBaseTest {
 				"inline method",
 				"Inline Method\tprivate convert(a int) : int inlined to public m1() : void in class a.Example1",
 				"@local/repos/toyrepo-r1/" + commit,
+				6,
 				"a6d21e18c680431b0d4a09374e31a72144a728dc");
 	}
 
