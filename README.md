@@ -62,10 +62,10 @@ The data collection tool can be executed via Docker containers. It should be as 
 _Tip:_ If you are restarting everything, make sure to not import the projects again. Otherwise, you will have duplicated entries. Simply leave the file name blank in `import -> environment -> FILE_TO_IMPORT`.
 
 ### Running in a manual way
-After compiling you can use the jar at `target/data-collection-RunImportCsv-jar-with-dependencies.jar`. usage is as follows:
+After building you can use the jar at `target/data-collection-RunImportStandalone-jar-with-dependencies.jar`. usage is as follows:
 
 ```
-Usage: java -jar target/data-collection-RunImportCsv-jar-with-dependencies.jar 
+Usage: java -jar data-collection-RunImportStandalone-jar-with-dependencies.jar 
       [options] some-input-file.csv
   Options:
     -c, --connection-pool

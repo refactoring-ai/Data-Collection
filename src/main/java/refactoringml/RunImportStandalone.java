@@ -32,14 +32,14 @@ import refactoringml.db.HibernateConfig.ConnectionPoolType;
 import refactoringml.db.HibernateConfig.DatabaseEngine;
 import refactoringml.util.PropertiesUtils;
 
-public class RunImportCsv {
-	private static final Logger log = LogManager.getLogger(RunImportCsv.class);
+public class RunImportStandalone {
+	private static final Logger log = LogManager.getLogger(RunImportStandalone.class);
 
 	public static void main(String[] args) throws Exception {
-		RunImportCsv runner = new RunImportCsv();
+		RunImportStandalone runner = new RunImportStandalone();
 		Args argv = new Args();
 		JCommander jc = new JCommander(argv);
-		jc.setProgramName("java -jar target/data-collection-RunImportCsv-jar-with-dependencies.jar");
+		jc.setProgramName("java -jar data-collection-RunImportStandalone-jar-with-dependencies.jar");
 		try {
 			jc.parse(args);
 		} catch (ParameterException pe) {
