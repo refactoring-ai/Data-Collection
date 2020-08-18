@@ -168,7 +168,7 @@ public class App {
 			// note that if this process crashes, finished date will be equals to null in the database
 			project.setFinishedDate(Calendar.getInstance());
 			project.setExceptions(exceptionsCount);
-			db.mergeComplete(project);
+			project = db.mergeComplete(project);
 
 			logProjectStatistics(startProjectTime);
 			return project;
@@ -258,7 +258,7 @@ public class App {
 		} catch (Exception e) {
 			exceptionsCount++;
 			log.error("Unhandled exception when collecting commit data for commit: " + commitHash + createErrorState(commitHash, project), e);
-			db.rollback(createErrorState(commitHash, project));
+			db.rollback(t, createErrorState(commitHash, project));
 		} 
 		long elapsedCommitTime = System.currentTimeMillis() - startCommitTime;
 		log.debug("Processing commit " + commitHash + " took " + elapsedCommitTime + " milliseconds.");
