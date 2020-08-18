@@ -160,7 +160,11 @@ public class App {
 				if (currentCommit.getParentCount() > 1)
 					continue;
 
-				processCommit(currentCommit, miner, handler, refactoringAnalyzer, processMetrics);
+				try {
+				    processCommit(currentCommit, miner, handler, refactoringAnalyzer, processMetrics);
+				catch (Exception e) {
+				    log.error("Could not process commit {} on project {}", currentCommit, project, e);
+				}
 			}
 			walk.close();
 
