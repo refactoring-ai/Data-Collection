@@ -264,6 +264,6 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 
 	@Test
 	public void projectMetrics() {
-		assertProjectMetrics(52, 23, 29, 7078, 2793, 4280);
+		assertProjectMetrics(52, 23, 29, 7078, 2793, 4285);
 	}
 }
