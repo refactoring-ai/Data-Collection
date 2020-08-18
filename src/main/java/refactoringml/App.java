@@ -161,7 +161,8 @@ public class App {
 					continue;
 
 				try {
-				    processCommit(currentCommit, miner, handler, refactoringAnalyzer, processMetrics);
+					processCommit(currentCommit, miner, handler, refactoringAnalyzer, processMetrics);
+				}
 				catch (Exception e) {
 				    log.error("Could not process commit {} on project {}", currentCommit, project, e);
 				}

@@ -25,13 +25,14 @@ It currently contains the following projects:
 * [Docker](https://docs.docker.com/engine/install/)
 * [Docker-compose](https://docs.docker.com/compose/install/)
 
-### Compiling the tool
+### Compiling and building the tool
+To compile: Use Maven: `mvn clean compile`. Or just import it via IntelliJ; it will know what to do.
 
-Use Maven: `mvn clean compile`. Or just import it via IntelliJ; it will know what to do.
+To generate executable jars, run `mvn clean package -DskipTests`
 
 If you want to export a jar file and run it somewhere else, just do `mvn clean package`. A .jar file will be created under the `target/` folder. You can use this jar to run the tool manually.
 
-To run the tests please run a local mariaDB database instance, for details see `src/main/test/java/integration/DataBaseInfor for details`.
+To run the tests please run a local mariaDB database instance, for details see `src/main/test/java/integration/DataBaseInfo for details`.
 
 ## Running via Docker
 
@@ -39,10 +40,8 @@ The **recommend** **way** to use this tool.
 
 The data collection tool can be executed via Docker containers. It should be as easy as:
 
-1. Clone the project: `git clone https://github.com/refactoring-ai/Data-Collection.git`
-2. Build the project: `mvn clean package -DskipTests`
-3. Move the built jar with dependencies from target dir into the lib dir: `mv target/data-collection-0.0.1-SNAPSHOT-jar-with-dependencies.jar lib/`
-4. Run the data-collection: `sudo ./run-data-collection.sh projects/projects-final.csv 4`
+1. Move the built jar with dependencies from target dir into the lib dir: `mv target/data-collection-0.0.1-SNAPSHOT-jar-with-dependencies.jar lib/`
+2. Run the data-collection: `sudo ./run-data-collection.sh projects/projects-final.csv 4`
 
 **Configurations** can be done with the following **arguments**:
 
@@ -63,28 +62,49 @@ The data collection tool can be executed via Docker containers. It should be as 
 _Tip:_ If you are restarting everything, make sure to not import the projects again. Otherwise, you will have duplicated entries. Simply leave the file name blank in `import -> environment -> FILE_TO_IMPORT`.
 
 ### Running in a manual way
-
-You can run the data collection by simply running the `RunSingleProject.java` class. This class contains a program that requires the following parameters, in this order:
-
-1. _The dataset name_: A hard-coded string with the name of the dataset (e.g., "apache", "fdroid"). This information appears in the generated data later on, so that you can use it as a filter.
-
-1. _The git URL_: The git url of the project to be analyzed. Your local machine must have all the permissions to clone it (i.e., _git clone url_ should work). Cloning will happen in a temporary directory.
-
-1. _Storage path_: The directory where the tool is going to store the source code before and after the refactoring. This step is important if you plan to do later analysis on the refactored files. The directory structure basically contains the hash of the refactoring, as well as the file before and after. The name of the file also contains the refactoring it suffered, to facilitate parsing. For more details on the name of the file, see our implementation.
-
-1. _Database URL_: JDBC URL that points to your MySQL. The database must exist and be empty. The tool will create the required tables.
-
-1. _Database user_: Database user.
-
-1. _Database password_: Database password. 
-
-1. _Store full source code?_: True if you want to store the source code before and after in the storage path.
-
-These parameters can be passed via command-line, if you exported a JAR file. 
-Example:
+After compiling you can use the jar at `target/data-collection-RunImportCsv-jar-with-dependencies.jar`. usage is as follows:
 
 ```
-java -jar refactoring.jar <dataset> <git-url> <output-path> <database-url> <database-user> <database-password> <k-threshold>
+Usage: java -jar target/data-collection-RunImportCsv-jar-with-dependencies.jar 
+      [options] some-input-file.csv
+  Options:
+    -c, --connection-pool
+      The connection pooling library used. currently supported values are 
+      MYSQL, MARIADB or POSTGRESQL
+      Default: HIKARICP
+    -d, --db-engine
+      The database engine being used, currently supported values are MYSQL, 
+      MARIADB or POSTGRESQL
+      Default: MARIADB
+    -h, --db-host
+      Host IP or address of database
+      Default: 127.0.0.1
+    -n, --db-name
+      Name of the database to use
+      Default: refactoringdb
+    -p, --db-password
+      Database password
+      Default: pass
+    -P, --db-port
+      Port of database
+    -u, --db-user
+      Database user
+      Default: <your user name>
+    -b, --hbm2ddl
+      The hibernate.hbm2ddl.auto in the database connection
+      Default: create
+    --help
+	  Prints this help message.
+    -r, --repo-clone-location
+      Repo clone location
+      Default: /tmp/repos
+    -s, --store-source-code
+      Store the source code of the metrics
+      Default: false
+    -t, thread-amount
+      Amount of threads to run in parallel.
+      available 
+      Default: <your-available-cores>
 ```
 
 ## Database Clean-up

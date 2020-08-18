@@ -8,6 +8,7 @@ import static refactoringml.util.FileUtils.removeFromFile;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
@@ -19,6 +20,7 @@ import java.util.stream.Stream;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
+import com.beust.jcommander.ParameterException;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -36,12 +38,33 @@ public class RunImportCsv {
 	public static void main(String[] args) throws Exception {
 		RunImportCsv runner = new RunImportCsv();
 		Args argv = new Args();
-		JCommander.newBuilder().addObject(argv).args(args).build();
+		JCommander jc = new JCommander(argv);
+		jc.setProgramName("java -jar target/data-collection-RunImportCsv-jar-with-dependencies.jar");
+		try {
+			jc.parse(args);
+		} catch (ParameterException pe) {
+			pe.usage();
+			System.exit(1);
+		}
+
+		if (argv.help) {
+			jc.usage();
+			System.exit(0);
+		}
+
+		Path inputFile = Paths.get(argv.inputCsvFile);
+		if (!Files.exists(inputFile)) {
+			System.err.printf("File at absolute path %s Does not exist", inputFile.toAbsolutePath());
+			System.exit(1);
+		} 
 		cleanOldTempDir();
-		runner.run(argv, "/tmp/repos");
+		runner.run(argv);
 	}
 
 	private static class Args {
+
+		@Parameter(names = "--help", help = true, description = "Prints this help message")
+		private boolean help;
 
 		@Parameter(names = { "-h", "--db-host" }, description = "Host IP or address of database")
 		private String databaseHost = "127.0.0.1";
@@ -80,12 +103,15 @@ public class RunImportCsv {
 				"thread-amount" }, description = "Amount of threads to run in parallel. Will default to amount of cores available")
 		private int runWithCores = Runtime.getRuntime().availableProcessors();
 
-		@Parameter(required = true, description = "Input csv file")
+		@Parameter(required = true, description = "some-input-file.csv")
 		private String inputCsvFile;
+
+		@Parameter(names = { "-r", "--repo-clone-location" }, description = "Repo clone location")
+		private String repoCloneLocation = "/tmp/repos";
 
 	}
 
-	private void run(Args args, String repoLocation) throws InterruptedException, IOException {
+	private void run(Args args) throws InterruptedException, IOException {
 		ThreadPoolExecutor tp = (ThreadPoolExecutor) Executors.newFixedThreadPool(args.runWithCores);
 		tp.setCorePoolSize(args.runWithCores);
 		try (SessionFactory sf = HibernateConfig.getSessionFactory(args.databaseHost,
@@ -93,8 +119,8 @@ public class RunImportCsv {
 				args.hbm2ddlStrategy, DatabaseEngine.valueOf(args.databaseEngine),
 				ConnectionPoolType.valueOf(args.connectionPoolType))) {
 			try (Stream<String> stream = Files.lines(Paths.get(args.inputCsvFile))) {
-				List<RepoProcesser> tasks = stream.map(line -> new RepoProcesser(repoLocation, args.storeSourceCode,
-						new Database(sf.openSession()), line)).collect(Collectors.toList());
+				List<RepoProcesser> tasks = stream.map(line -> new RepoProcesser(args.repoCloneLocation,
+						args.storeSourceCode, new Database(sf.openSession()), line)).collect(Collectors.toList());
 				tp.invokeAll(tasks);
 			}
 			tp.shutdown();
