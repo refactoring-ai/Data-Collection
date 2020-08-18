@@ -1,5 +1,6 @@
 # Machine Learning for Software refactoring
 [![Build Status](https://travis-ci.org/refactoring-ai/Data-Collection.svg?branch=master)](https://travis-ci.org/refactoring-ai/Data-Collection)
+[![codecov](https://codecov.io/gh/refactoring-ai/Data-Collection/branch/master/graph/badge.svg)](https://codecov.io/gh/refactoring-ai/Data-Collection)
 
 This repository contains the data-collection part on the use of machine learning methods to recommend software refactoring.
 
