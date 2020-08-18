@@ -2,6 +2,8 @@ package refactoringml;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.SessionFactory;
+
 import refactoringml.db.Database;
 import refactoringml.db.HibernateConfig;
 import static refactoringml.util.FilePathUtils.lastSlashDir;
@@ -54,12 +56,12 @@ public class RunSingleProject {
 		}
 
 		Database db = null;
-		try {
-			db = new Database(new HibernateConfig().getSessionFactory(url, user, pwd));
+		try (SessionFactory sf = HibernateConfig.getSessionFactory(url, user, pwd)) {
+			db = new Database(sf);
 		} catch(Exception e) {
-			log.error("Error when connecting to the Database: ", e);
+			log.fatal("Error when connecting to the Database: ", e);
 		}
-
 		new App(datasetName, gitUrl, storagePath, db, storeFullSourceCode).run();
+
 	}
 }
