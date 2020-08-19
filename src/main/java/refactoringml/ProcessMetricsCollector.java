@@ -62,7 +62,7 @@ public class ProcessMetricsCollector {
 					new ProcessMetrics(0, 0, 0, 0, 0);
 
 			refactoringCommit.setProcessMetrics(dbProcessMetrics);
-			db.update(refactoringCommit);
+			db.merge(refactoringCommit);
 
 			pmDatabase.reportRefactoring(fileName, superCommitMetaData);
 		}

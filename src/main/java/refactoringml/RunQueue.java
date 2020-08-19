@@ -4,6 +4,8 @@ import com.rabbitmq.client.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.docker.DockerLookup;
+import org.hibernate.SessionFactory;
+
 import refactoringml.db.Database;
 import refactoringml.db.HibernateConfig;
 import refactoringml.util.PropertiesUtils;
@@ -25,7 +27,7 @@ public class RunQueue {
 	private File failedProjectsFile;
 
 	public final static String QUEUE_NAME = "refactoring";
-	private final Database db;
+	private final SessionFactory sf;
 	private String storagePath;
 	private String host;
 	private final boolean storeFullSourceCode;
@@ -42,7 +44,7 @@ public class RunQueue {
 		failedProjectsFile = new File(enforceUnixPaths(PropertiesUtils.getProperty("failedProjectsFile") + "_" + containerName));
 		failedProjectsFile.getParentFile().mkdirs();
 
-		db = new Database(HibernateConfig.getSessionFactory(url, user, pwd));
+		sf = HibernateConfig.getSessionFactory(url, user, pwd);
 		log.debug(toString());
 	}
 
@@ -112,7 +114,7 @@ public class RunQueue {
 		if (channel != null && channel.isOpen())
 			channel.getConnection().close();
 		//shutdown the connection with the MYSQL database
-		db.shutdown();
+		sf.close();
 		//end the worker
 		System.exit(0);
 	}
@@ -126,7 +128,7 @@ public class RunQueue {
 		String projectInfo = gitUrl + ", " + dataset;
 		appendToFile(failedProjectsFile, projectInfo + "\n");
 		try {
-			new App(dataset, gitUrl, storagePath, db, storeFullSourceCode).run();
+			new App(dataset, gitUrl, storagePath, new Database(sf.openSession()), storeFullSourceCode).run();
 		} catch (org.eclipse.jgit.api.errors.TransportException te){
 			storeFailedProject(gitUrl, "Repository not available", te);
 		} catch (Exception e) {
@@ -150,6 +152,6 @@ public class RunQueue {
 				"host = " + host + "\n" +
 				"storagePath = " + storagePath + "\n" +
 				"storeFullSourceCode = " + storeFullSourceCode +
-				"db = " + db.toString() + "}";
+				"sf = " + sf.toString() + "}";
 	}
 }

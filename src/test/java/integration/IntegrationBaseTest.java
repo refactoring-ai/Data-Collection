@@ -5,7 +5,9 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.Assert;
 import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.refactoringminer.util.GitServiceImpl;
 import refactoringml.App;
@@ -23,7 +25,6 @@ import static refactoringml.util.PropertiesUtils.setProperty;
 
 public abstract class IntegrationBaseTest {
 
-	protected Database db;
 	protected String outputDir;
 	protected SessionFactory sf;
 	protected String tmpDir;
@@ -57,7 +58,6 @@ public abstract class IntegrationBaseTest {
 	@BeforeAll
 	protected void runApp() throws Exception {
 		sf = HibernateConfig.getSessionFactory(DataBaseInfo.URL, DataBaseInfo.USER, DataBaseInfo.PASSWORD, drop());
-		db = new Database(sf);
 		outputDir = createTmpDir();
 		tmpDir = createTmpDir();
 
@@ -72,10 +72,11 @@ public abstract class IntegrationBaseTest {
 		//set the stableCommitThreshold in the PMDatabase to test various configs
 		setProperty("stableCommitThresholds", getStableCommitThreshold());
 
+		Database database = new Database(sf.openSession());
 		App app = new App("integration-test-dataset",
 				repoLocalDir,
 				outputDir,
-				db,
+				database,
 				getFirstCommit(),
 				getLastCommit(),
 				storeSourceCode());
@@ -85,9 +86,19 @@ public abstract class IntegrationBaseTest {
 
 	@AfterAll
 	protected void afterApp() throws IOException {
-		db.close();
+		sf.close();
 		FileUtils.deleteDirectory(new File(tmpDir));
 		FileUtils.deleteDirectory(new File(outputDir));
+	}
+
+	@BeforeEach
+	void beforeEach() {
+		session = sf.openSession();
+	}
+
+	@AfterEach
+	void afterEach() {
+		session.close();
 	}
 
 	private List<Long> getIds(String metricsName, List<Long> projectIds){
@@ -107,10 +118,8 @@ public abstract class IntegrationBaseTest {
 	}
 
 	protected void deleteProject(String repository) {
-		try {
-			session = sf.openSession();
-
-			List<Project> projects = (List<Project>) session.createQuery("FROM Project WHERE projectName = :projectName")
+			Session deleteProjectSession = sf.openSession();
+			List<Project> projects = (List<Project>) deleteProjectSession.createQuery("FROM Project WHERE projectName = :projectName")
 					.setParameter("projectName", repository).list();
 			List<Long> projectIds = projects.stream().map(Project::getId).collect(Collectors.toList());
 
@@ -122,11 +131,11 @@ public abstract class IntegrationBaseTest {
 				List<Long> fieldMetrics = getIds("fieldMetrics", projectIds);
 				List<Long> processMetrics = getIds("processMetrics", projectIds);
 
-				session.beginTransaction();
-				session.createQuery("DELETE FROM RefactoringCommit WHERE project.id IN :projectIds")
+				deleteProjectSession.beginTransaction();
+				deleteProjectSession.createQuery("DELETE FROM RefactoringCommit WHERE project.id IN :projectIds")
 						.setParameter("projectIds", projectIds)
 						.executeUpdate();
-				session.createQuery("DELETE FROM StableCommit WHERE project.id IN :projectIds")
+				deleteProjectSession.createQuery("DELETE FROM StableCommit WHERE project.id IN :projectIds")
 						.setParameter("projectIds", projectIds)
 						.executeUpdate();
 
@@ -137,15 +146,12 @@ public abstract class IntegrationBaseTest {
 				deleteMetrics("FieldMetric", fieldMetrics);
 				deleteMetrics("ProcessMetrics", processMetrics);
 
-				projects.stream().forEach(session::delete);
-				session.getTransaction().commit();
+				projects.stream().forEach(deleteProjectSession::delete);
+				deleteProjectSession.getTransaction().commit();
 			}
 
-			session.close();
-		} catch(Exception e) {
-			System.out.println("Could not delete the project before starting the test");
-			e.printStackTrace();
-		}
+			// System.out.println("Could not delete the project before starting the test");
+		
 	}
 
 	//Get all RefactoringCommits from the DB as a List, use this instead of a custom query
@@ -153,12 +159,9 @@ public abstract class IntegrationBaseTest {
 		if(refactoringCommits != null)
 			return refactoringCommits;
 
-		this.session = sf.openSession();
 		refactoringCommits = session.createQuery("From RefactoringCommit where project = :project AND isValid = TRUE order by id asc")
 				.setParameter("project", project)
 				.list();
-		this.session.close();
-		this.session = null;
 		return refactoringCommits;
 	}
 
@@ -167,12 +170,9 @@ public abstract class IntegrationBaseTest {
 		if(stableCommits != null)
 			return stableCommits;
 
-		this.session = sf.openSession();
 		stableCommits = session.createQuery("From StableCommit where project = :project order by id asc")
 				.setParameter("project", project)
 				.list();
-		this.session.close();
-		this.session = null;
 		return stableCommits;
 	}
 
@@ -261,20 +261,16 @@ public abstract class IntegrationBaseTest {
 
 	@Test
 	public void monitorDuplicateStableInstances(){
-		Session shortSession = sf.openSession();
 		String query = "SELECT COUNT(*) FROM (SELECT DISTINCT s.className, s.filePath, s.isTest, s.level, s.commitThreshold, s.classMetrics_id, s.commitMetaData_id, s.fieldMetrics_id, s.methodMetrics_id, s.processMetrics_id, s.project_id, s.variableMetrics_id From StableCommit s where s.project_id = " + project.getId() + ") t";
-		Object result = shortSession.createSQLQuery(query).getSingleResult();
-		shortSession.close();
+		Object result = session.createSQLQuery(query).getSingleResult();
 		int uniqueStableCommits = Integer.parseInt(result.toString());
 		Assert.assertEquals(uniqueStableCommits, getStableCommits().size());
 	}
 
 	@Test
 	public void monitorDuplicateRefactoringInstances(){
-		Session shortSession = sf.openSession();
 		String query = "SELECT COUNT(*) FROM (SELECT DISTINCT s.refactoring, s.refactoringSummary, s.className, s.filePath, s.isTest, s.level, s.classMetrics_id, s.commitMetaData_id, s.fieldMetrics_id, s.methodMetrics_id, s.processMetrics_id, s.project_id, s.variableMetrics_id From RefactoringCommit s where s.isValid = TRUE AND s.project_id = " + project.getId() + ") t";
-		Object result = shortSession.createSQLQuery(query).getSingleResult();
-		shortSession.close();
+		Object result = session.createSQLQuery(query).getSingleResult();
 		int uniqueRefactoringCommits = Integer.parseInt(result.toString());
 		Assert.assertEquals(uniqueRefactoringCommits, getRefactoringCommits().size());
 	}
@@ -282,13 +278,10 @@ public abstract class IntegrationBaseTest {
 	//Test if we have invalid or redundant commit-metadata collected
 	@Test
 	public void relevantCommitMetaData(){
-		session = sf.openSession();
 		List<String> allRelevantCommitIds = session.createQuery("SELECT DISTINCT r.commitMetaData.commitId FROM RefactoringCommit r WHERE r.isValid = TRUE").list();
 		allRelevantCommitIds.addAll(session.createQuery("SELECT DISTINCT s.commitMetaData.commitId FROM StableCommit s").list());
 		allRelevantCommitIds = allRelevantCommitIds.stream().distinct().collect(Collectors.toList());
 		List<String> allCommitMetaDatas = session.createQuery("SELECT DISTINCT c.commitId From CommitMetaData c").list();
-		session.close();
-		session = null;
 
 		Assert.assertEquals(allRelevantCommitIds.size(), allCommitMetaDatas.size());
 	}

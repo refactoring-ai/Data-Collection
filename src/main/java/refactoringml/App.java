@@ -11,6 +11,7 @@ import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
+import org.hibernate.Transaction;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.GitService;
 import org.refactoringminer.api.Refactoring;
@@ -26,6 +27,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
+
 import static refactoringml.util.FilePathUtils.enforceUnixPaths;
 import static refactoringml.util.FilePathUtils.lastSlashDir;
 import static refactoringml.util.FileUtils.createTmpDir;
@@ -159,7 +161,12 @@ public class App {
 				if (currentCommit.getParentCount() > 1)
 					continue;
 
-				processCommit(currentCommit, commitNumber, miner, handler, refactoringAnalyzer, processMetrics);
+				try {
+					processCommit(currentCommit, commitNumber, miner, handler, refactoringAnalyzer, processMetrics);
+				}
+				catch (Exception e) {
+				    log.error("Could not process commit {} on project {}", currentCommit, project, e);
+				}
 				commitNumber += 1;
 			}
 			walk.close();
@@ -168,11 +175,12 @@ public class App {
 			// note that if this process crashes, finished date will be equals to null in the database
 			project.setFinishedDate(Calendar.getInstance());
 			project.setExceptions(exceptionsCount);
-			db.updateComplete(project);
+			project = db.mergeComplete(project);
 
 			logProjectStatistics(startProjectTime);
 			return project;
 		} finally {
+			db.close();
 			// delete the tmp dir that stores the project
 			FileUtils.deleteDirectory(new File(currentTempDir));
 		}
@@ -212,9 +220,8 @@ public class App {
 	private void processCommit(RevCommit currentCommit, int commitNumber, GitHistoryRefactoringMiner miner, RefactoringHandler handler, RefactoringAnalyzer refactoringAnalyzer, ProcessMetricsCollector processMetrics){
 		long startCommitTime = System.currentTimeMillis();
 		String commitHash = currentCommit.getId().getName();
+		Transaction t = db.beginTransaction();
 		try{
-			db.openSession();
-
 			refactoringsToProcess = null;
 			commitIdToProcess = null;
 
@@ -253,15 +260,13 @@ public class App {
 			Set<ImmutablePair<String, String>> jGitRenames = getJGitRenames(entries);
 			processMetrics.collectMetrics(currentCommit, superCommitMetaData, allRefactoringCommits, entries, refactoringRenames, jGitRenames);
 			long startTimeTransaction = System.currentTimeMillis();
-			db.commit();
+			t.commit();
 			log.debug("Committing the transaction for commit " + commitHash + " took " + (System.currentTimeMillis() - startTimeTransaction) + " milliseconds.");
 		} catch (Exception e) {
 			exceptionsCount++;
 			log.error("Unhandled exception when collecting commit data for commit: " + commitHash + createErrorState(commitHash, project), e);
-			db.rollback(createErrorState(commitHash, project));
-		} finally {
-			db.close();
-		}
+			db.rollback(t, createErrorState(commitHash, project));
+		} 
 		long elapsedCommitTime = System.currentTimeMillis() - startCommitTime;
 		log.debug("Processing commit " + commitHash + " took " + elapsedCommitTime + " milliseconds.");
 	}
