@@ -77,6 +77,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 		assertMetaDataStable(
 				lastRefactoring,
 				"@local/repos/toyrepo-r3/" + lastRefactoring,
+				5,
 				"0e094a734239b1bcc6d6bce1436200c0e45b1e8d",
 				"rename");
 
@@ -112,14 +113,27 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitMetaData(){
+	public void commitMetaData1(){
 		String commit = "376304b51193e5fade802be2cbd7523d6a5ba664";
 		assertMetaDataRefactoring(
 				commit,
 				"Move and Rename Class testing",
 				"Move And Rename Class\tAnimal moved and renamed to inheritance.superinfo.AnimalSuper",
 				"@local/repos/toyrepo-r3/" + commit,
+				6,
 				"061febd820977f2b00c4926634f09908cc5b8b08");
+	}
+
+	@Test
+	public void commitMetaData2(){
+		String commit = "061febd820977f2b00c4926634f09908cc5b8b08";
+		assertMetaDataRefactoring(
+				commit,
+				"rename",
+				"Rename Parameter\tinfo : String to noise : String in method package abstract sound(noise String) : void in class Animal",
+				"@local/repos/toyrepo-r3/" + commit,
+				5,
+				"0e094a734239b1bcc6d6bce1436200c0e45b1e8d");
 	}
 
 	@Test

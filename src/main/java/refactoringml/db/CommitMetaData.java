@@ -30,6 +30,9 @@ public class CommitMetaData {
     @Temporal(TemporalType.TIMESTAMP)
     private Calendar commitDate;
 
+    //Number of this commit (number of previous commits plus 1)
+    private int commitNumber;
+
     //id of the parent commit, if none exists:
     // the parent commit points to the commit that we calculate the code metrics
     // (we calculate the metrics in the version of file *before* the refactoring)
@@ -42,14 +45,16 @@ public class CommitMetaData {
     public CommitMetaData(String commitId, String fullMessage, String url, String parentId) {
         this.commitId = commitId.trim();
         this.commitDate = new GregorianCalendar();
+        this.commitNumber = -1;
         this.commitMessage = fullMessage.trim();
         this.commitUrl = url;
         this.parentCommitId = parentId.trim();
     }
 
-    public CommitMetaData(RevCommit commit, Project project){
+    public CommitMetaData(RevCommit commit, int commitNumber, Project project){
         this.commitId = commit.getName().trim();
         this.commitDate = JGitUtils.getGregorianCalendar(commit);
+        this.commitNumber = commitNumber;
         this.commitMessage = commit.getFullMessage().trim();
         this.commitUrl = JGitUtils.generateCommitUrl(project.getGitUrl(), commitId, project.isLocal());
         this.parentCommitId = commit.getParentCount() == 0 ? "Null" : commit.getParent(0).getName().trim();
@@ -67,11 +72,14 @@ public class CommitMetaData {
         return id;
     }
 
+    public int getCommitNumber(){ return commitNumber; }
+
     @Override
     public String toString() {
         return "CommitMetaData{" +
                 "commit=" + commitId +
                 ", commitDate=" + commitDate +
+                ", commitNumber=" + commitNumber +
                 ", commitMessage=" + commitMessage +
                 ", commitUrl=" + commitUrl +
                 ", parentCommit='" + parentCommitId + '\'' +

@@ -151,6 +151,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 						"git-svn-id: https://svn.apache.org/repos/asf/jakarta/commons/proper/cli/trunk@129803 13f79535-47bb-0310-9956-ffa450edef68",
 				"Extract Variable\tkey : String in method package setOpt(opt Option) : void from class org.apache.commons.cli.CommandLine",
 				"@local/repos/commons-cli/" + renameCommit,
+				37,
 				"469e71799a438ccb2d0925e50d4bb9dce37cdba2");
 
 		String moveCommit = "347bbeb8f98a49744501ac50850457ba8751d545";
@@ -162,6 +163,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 						"git-svn-id: https://svn.apache.org/repos/asf/jakarta/commons/proper/cli/trunk@129846 13f79535-47bb-0310-9956-ffa450edef68",
 				"Rename Parameter\topts : Options to options : Options in method public parse(options Options, arguments String[], stopAtNonOption boolean) : CommandLine in class org.apache.commons.cli.Parser",
 				"@local/repos/commons-cli/" + moveCommit,
+				76,
 				"3b8e3de5b7599a6165d48103f94f3a830361188d");
 	}
 
@@ -171,6 +173,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 		assertMetaDataStable(
 				stableCommit1,
 				"@local/repos/commons-cli/" + stableCommit1,
+				2,
 				"4868ac5e7c2afd428de74a6dcbec07dc6541a1ea",
 				"moved cli over from the sandbox to commons proper\n" +
 						"\n" +
@@ -181,6 +184,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 		assertMetaDataStable(
 				stableCommit2,
 				"@local/repos/commons-cli/" + stableCommit2,
+				39,
 				"dde69934d7f0bee13e4cd1fc99a7d60ce95a0c78",
 				"javadoc updates\n" +
 						"\n" +

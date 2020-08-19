@@ -142,6 +142,7 @@ public class App {
 			log.info("Start mining project " + gitUrl + "(clone at " + clonePath + ")");
 
 			boolean firstCommitFound = firstCommitToProcess == null;
+			int commitNumber = 1;
 			// we only analyze commits that have one parent or the first commit with 0 parents
 			for (boolean endFound = false; currentCommit!=null && !endFound; currentCommit = walk.next()) {
 				String commitHash = currentCommit.getId().getName();
@@ -161,11 +162,12 @@ public class App {
 					continue;
 
 				try {
-					processCommit(currentCommit, miner, handler, refactoringAnalyzer, processMetrics);
+					processCommit(currentCommit, commitNumber, miner, handler, refactoringAnalyzer, processMetrics);
 				}
 				catch (Exception e) {
 				    log.error("Could not process commit {} on project {}", currentCommit, project, e);
 				}
+				commitNumber += 1;
 			}
 			walk.close();
 
@@ -215,7 +217,7 @@ public class App {
 				numberOfCommits, getProperty("stableCommitThresholds"), lastCommitHash, counterResult, projectSize);
 	}
 
-	private void processCommit(RevCommit currentCommit, GitHistoryRefactoringMiner miner, RefactoringHandler handler, RefactoringAnalyzer refactoringAnalyzer, ProcessMetricsCollector processMetrics){
+	private void processCommit(RevCommit currentCommit, int commitNumber, GitHistoryRefactoringMiner miner, RefactoringHandler handler, RefactoringAnalyzer refactoringAnalyzer, ProcessMetricsCollector processMetrics){
 		long startCommitTime = System.currentTimeMillis();
 		String commitHash = currentCommit.getId().getName();
 		Transaction t = db.beginTransaction();
@@ -226,7 +228,7 @@ public class App {
 			//stores all the ck metrics for the current commit
 			List<RefactoringCommit> allRefactoringCommits = new ArrayList<>();
 			// stores the commit meta data
-			CommitMetaData superCommitMetaData = new CommitMetaData(currentCommit, project);
+			CommitMetaData superCommitMetaData = new CommitMetaData(currentCommit, commitNumber, project);
 			List<DiffEntry> entries = calculateDiffEntries(currentCommit);
 			// Note that we only run it if the commit has a parent, i.e, skip the first commit of the repo
 			if (!isFirst(currentCommit)){

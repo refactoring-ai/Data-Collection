@@ -141,7 +141,7 @@ public class ProcessMetricsCollector {
 					if(pmTracker.getCommitCountThreshold() == project.getMaxCommitThreshold()){
 						log.debug("Reset pmTracker for class " + pmTracker.getFileName() + " with threshold: " + pmTracker.getCommitCountThreshold() +
 								" because it is the max threshold(" + project.getMaxCommitThreshold() + ").");
-						pmTracker.resetCounter(new CommitMetaData(commit, project));
+						pmTracker.resetCounter(new CommitMetaData(commit, superCommitMetaData.getCommitNumber(), project));
 					}
 				}
 			}

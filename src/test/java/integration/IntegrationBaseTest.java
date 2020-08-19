@@ -198,23 +198,24 @@ public abstract class IntegrationBaseTest {
 		Assert.assertEquals(stableCommits, assertCommits);
 	}
 
-	protected void assertMetaDataRefactoring(String commit, String commitMessage, String refactoringSummary, String commitUrl, String parentCommit){
+	protected void assertMetaDataRefactoring(String commit, String commitMessage, String refactoringSummary, String commitUrl, int commitNumber, String parentCommit){
 		RefactoringCommit refactoringCommit = (RefactoringCommit) filterCommit(getRefactoringCommits(), commit).get(0);
 
 		Assert.assertEquals(refactoringSummary, refactoringCommit.getRefactoringSummary());
-		assertMetaData(refactoringCommit.getCommitMetaData(), commitUrl, parentCommit, commitMessage);
+		assertMetaData(refactoringCommit.getCommitMetaData(), commitUrl, commitNumber, parentCommit, commitMessage);
 	}
 
-	protected void assertMetaDataStable(String commit, String commitUrl, String parentCommit, String commitMessage) {
+	protected void assertMetaDataStable(String commit, String commitUrl, int commitNumber, String parentCommit, String commitMessage) {
 		StableCommit stableCommit = (StableCommit) filterCommit(getStableCommits(), commit).get(0);
 
-		assertMetaData(stableCommit.getCommitMetaData(), commitUrl, parentCommit, commitMessage);
+		assertMetaData(stableCommit.getCommitMetaData(), commitUrl, commitNumber, parentCommit, commitMessage);
 	}
 
-	private void assertMetaData(CommitMetaData commitMetaData, String commitUrl, String parentCommit, String commitMessage){
+	private void assertMetaData(CommitMetaData commitMetaData, String commitUrl, int commitNumber, String parentCommit, String commitMessage){
 		Assert.assertEquals(commitUrl, commitMetaData.getCommitUrl());
 		Assert.assertEquals(parentCommit, commitMetaData.getParentCommitId());
 		Assert.assertEquals(commitMessage, commitMetaData.getCommitMessage());
+		Assert.assertEquals(commitNumber, commitMetaData.getCommitNumber());
 	}
 
 	protected void assertProcessMetrics(Instance instance, String truth) {
