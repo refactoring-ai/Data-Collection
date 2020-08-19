@@ -1,16 +1,17 @@
 package refactoringml;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import refactoringml.db.Project;
 import refactoringml.util.Counter;
 
 import java.util.Calendar;
 import java.util.List;
 
-public class ProjectTest {
+class ProjectTest {
     @Test
-    public void constructor(){
+    void constructor(){
         Counter.CounterResult counterResult = Counter.countProductionAndTestFiles("");
         Calendar time = Calendar.getInstance();
 

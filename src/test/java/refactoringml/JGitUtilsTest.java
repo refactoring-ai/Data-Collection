@@ -1,18 +1,19 @@
 package refactoringml;
 
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import refactoringml.util.JGitUtils;
 
-public class JGitUtilsTest {
+class JGitUtilsTest {
 
 	@Test
-	public void extractProjectNameFromHttpUrl() {
+	void extractProjectNameFromHttpUrl() {
 		Assert.assertEquals("commons-collections", JGitUtils.extractProjectNameFromGitUrl("https://www.github.com/apache/commons-collections.git"));
 	}
 
 	@Test
-	public void extractProjectNameFromGitSSHUrl() {
+	void extractProjectNameFromGitSSHUrl() {
 		Assert.assertEquals("commons-collections", JGitUtils.extractProjectNameFromGitUrl("git@github.com:apache/commons-collections.git"));
 	}
 }
