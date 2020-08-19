@@ -71,6 +71,7 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 				"rename class",
 				"Rename Class\tPerson renamed to People",
 				"@local/repos/toyrepo-r2/" + commit,
+				2,
 				"d56acf6b23d646528b4b04779b0fe64d74811052");
 	}
 
