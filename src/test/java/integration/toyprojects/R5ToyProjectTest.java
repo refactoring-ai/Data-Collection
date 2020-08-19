@@ -47,6 +47,7 @@ public class R5ToyProjectTest extends IntegrationBaseTest {
 				"extract method",
 				"Extract Method\tprivate print2() : void extracted from public print() : void in class a.Test",
 				"@local/repos/toyrepo-r5/" + commit,
+				2,
 				"3f56031b1be69cb8db1779ef79645c2ab93a1616");
 	}
 
