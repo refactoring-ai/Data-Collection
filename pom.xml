@@ -119,8 +119,12 @@
 		<version>2.6.2</version>
 	  </dependency>
 	
+	  <dependency>
+        <groupId>com.beust</groupId>
+        <artifactId>jcommander</artifactId>
+        <version>1.78</version>
+      </dependency>
 	
-
   </dependencies>
 
 	<build>
@@ -164,6 +168,26 @@
 							<descriptorRefs>
 								<descriptorRef>jar-with-dependencies</descriptorRef>
 							</descriptorRefs>
+						</configuration>
+					</execution>
+					<execution>
+						<id>RunImportStandalone</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+						<configuration>
+							<archive>
+								<manifest>
+									<mainClass>
+                                        refactoringml.RunImportStandalone
+                                    </mainClass>
+								</manifest>
+							</archive>
+							<descriptorRefs>
+								<descriptorRef>jar-with-dependencies</descriptorRef>
+							</descriptorRefs>
+							<finalName>${project.artifactId}-RunImportStandalone</finalName>
 						</configuration>
 					</execution>
 				</executions>
