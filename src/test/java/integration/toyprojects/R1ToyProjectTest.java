@@ -1,16 +1,15 @@
 package integration.toyprojects;
 
-import integration.IntegrationBaseTest;
 import org.junit.Assert;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+
+import integration.IntegrationBaseTest;
 import refactoringml.db.RefactoringCommit;
 
-import java.util.stream.Collectors;
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R1ToyProjectTest extends IntegrationBaseTest {
+class R1ToyProjectTest extends IntegrationBaseTest {
 
 	@Override
 	protected String getRepo() {
@@ -18,7 +17,7 @@ public class R1ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void refactorings() {
+	void refactorings() {
 		Assert.assertEquals(3, getRefactoringCommits().size());
 
 		assertRefactoring(getRefactoringCommits(), "e8895b22847c7c54a9e187f9f674db274e6bc103", "Extract Method", 1);
@@ -29,13 +28,13 @@ public class R1ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void stable() {
+	void stable() {
 		// there are no instances of stable variables, as the repo is too small
 		Assert.assertEquals(0, getStableCommits().size());
 	}
 
 	@Test
-	public void commitMetaData(){
+	void commitMetaData(){
 		String commit = "21151bf7e36da52b9305d99755eb6f0b7616e620";
 		assertMetaDataRefactoring(
 				commit,
@@ -47,7 +46,7 @@ public class R1ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void projectMetrics() {
+	void projectMetrics() {
 		assertProjectMetrics(1, 1, 0, 9, 9, 0);
 	}
 }

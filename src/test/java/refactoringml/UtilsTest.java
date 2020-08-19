@@ -2,7 +2,8 @@ package refactoringml;
 
 import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
+
 import refactoringml.util.FilePathUtils;
 
 import java.util.Random;
@@ -10,22 +11,22 @@ import java.util.Random;
 import static refactoringml.util.FileUtils.IsJavaFile;
 import static refactoringml.util.FileUtils.IsTestFile;
 
-public class UtilsTest {
+class UtilsTest {
 	@Test
-	public void classFromFileName() {
+	void classFromFileName() {
 		Assert.assertEquals("File", FilePathUtils.classFromFileName("/some/dir/File.java"));
 		Assert.assertEquals("File", FilePathUtils.classFromFileName("c:\\some\\dir\\File.java"));
 		Assert.assertEquals("File", FilePathUtils.classFromFileName("/File.java"));
 	}
 
 	@Test
-	public void classFromFullName() {
+	void classFromFullName() {
 		Assert.assertEquals("File", FilePathUtils.classFromFullName(".some.pack.File"));
 		Assert.assertEquals("File", FilePathUtils.classFromFullName("File"));
 	}
 
 	@Test
-	public void isJavaFile(){
+	void isJavaFile(){
 		for(int i = 0; i < 100; i++){
 			String randomString = generateRandomString();
 
@@ -40,7 +41,7 @@ public class UtilsTest {
 	}
 
 	@Test
-	public void isTest(){
+	void isTest(){
 		for(int i = 0; i < 100; i++){
 			String randomString = generateRandomString();
 
@@ -62,7 +63,7 @@ public class UtilsTest {
 	}
 
 	@Test
-	public void onlyFileName() {
+	void onlyFileName() {
 		Assert.assertEquals("File.java", FilePathUtils.fileNameOnly("/some/dir/File.java"));
 		Assert.assertEquals("File.java", FilePathUtils.fileNameOnly("File.java"));
 		Assert.assertEquals("File.java", FilePathUtils.fileNameOnly("/File.java"));

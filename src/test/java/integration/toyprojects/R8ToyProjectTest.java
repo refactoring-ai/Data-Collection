@@ -10,7 +10,7 @@ import java.util.List;
 
 // tests related to PR #144: https://github.com/refactoring-ai/predicting-refactoring-ml/issues/144
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R8ToyProjectTest extends IntegrationBaseTest {
+class R8ToyProjectTest extends IntegrationBaseTest {
 
 	@Override
 	protected String getRepo() {

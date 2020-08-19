@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R3ToyProjectTest extends IntegrationBaseTest {
+class R3ToyProjectTest extends IntegrationBaseTest {
 	@Override
 	protected String getStableCommitThreshold() {return List.of(3, 5, 6).toString();}
 
@@ -26,7 +26,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 	// However the Pull Up Attribute in commit 556cf904bc didnt work.
 	// commit 892ffd8486daaedb5c92a548a23b87753393ce16 should show two refactoring -- Rename Class and Push Down Method
 	@Test
-	public void refactorings() {
+	void refactorings() {
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		Assert.assertEquals(17, refactoringCommitList.size());
 
@@ -48,7 +48,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitCount(){
+	void commitCount(){
 		List<Integer> qtyOfCommitsDogList = getRefactoringCommits().stream()
 				.filter(refactoring -> refactoring.getClassName().equals("Dog"))
 				.map(refactoring -> refactoring.getProcessMetrics().qtyOfCommits)
@@ -63,7 +63,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 
 	//Test if various commits are found correctly, requires the multiple Ks feature to work correct
 	@Test
-	public void stableCommits() {
+	void stableCommits() {
 		//TODO: Why are the stableCommits multiples of three? Classes are always added three times instead of once
 		List<StableCommit> stableCommitList = getStableCommits();
 
@@ -87,7 +87,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 
 	//Test if all refactorings with multiple Ks are detected correctly.
 	@Test
-	public void stableThresholds() {
+	void stableThresholds() {
 		List<StableCommit> highestStabilityThreshold = getStableCommits().stream().filter(commit ->
 				commit.getCommitThreshold() >= 50).collect(Collectors.toList());
 		Assert.assertEquals(0, highestStabilityThreshold.size());
@@ -113,7 +113,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitMetaData1(){
+	void commitMetaData1(){
 		String commit = "376304b51193e5fade802be2cbd7523d6a5ba664";
 		assertMetaDataRefactoring(
 				commit,
@@ -125,7 +125,7 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitMetaData2(){
+	void commitMetaData2(){
 		String commit = "061febd820977f2b00c4926634f09908cc5b8b08";
 		assertMetaDataRefactoring(
 				commit,
@@ -135,9 +135,8 @@ public class R3ToyProjectTest extends IntegrationBaseTest {
 				5,
 				"0e094a734239b1bcc6d6bce1436200c0e45b1e8d");
 	}
-
 	@Test
-	public void projectMetrics() {
+	void projectMetrics() {
 		assertProjectMetrics(3, 3, 0, 23, 23, 0);
 	}
 }

@@ -10,7 +10,7 @@ import java.util.List;
 
 // tests related to PR #144: https://github.com/refactoring-ai/predicting-refactoring-ml/issues/144
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R7ToyProjectTest extends IntegrationBaseTest {
+class R7ToyProjectTest extends IntegrationBaseTest {
 
 	@Override
 	protected String getRepo() {
@@ -26,7 +26,7 @@ public class R7ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void MoveRefactoring(){
+	void MoveRefactoring(){
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 
 		String moveRefactoring1 = "dce3865b05fe0b6e1db8e23f17dec498018d3f2f";
@@ -40,7 +40,7 @@ public class R7ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void methodInvocations(){
+	void methodInvocations(){
 		String commit = "dce3865b05fe0b6e1db8e23f17dec498018d3f2f";
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		RefactoringCommit lastCommit = refactoringCommitList.stream().filter(refactoringCommit ->
@@ -51,7 +51,7 @@ public class R7ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void ProcessMetrics(){
+	void ProcessMetrics(){
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		String renameVariable = "dce3865b05fe0b6e1db8e23f17dec498018d3f2f";
 		RefactoringCommit renameCommit = (RefactoringCommit) filterCommit(refactoringCommitList, renameVariable).get(0);

@@ -40,6 +40,13 @@ jobs:
         - cd ../Data-Collection/
         - mvn -f pom.xml -q -DskipTests clean compile package
       script: mvn -f pom.xml -Dtest=integration.realprojects.ApacheCommonsCSV*Test test
+
+    - name: "Test Integration Realproject ApacheCommonsLangIntegrationTest - Data-Collection: Java"
+      jdk: openjdk11
+      install:
+        - cd ../Data-Collection/
+        - mvn -f pom.xml -q -DskipTests clean compile package
+      script: mvn -f pom.xml -Dtest=integration.realprojects.ApacheCommonsLangIntegrationTest*Test test
       
 after_success:
   - bash <(curl -s https://codecov.io/bash)

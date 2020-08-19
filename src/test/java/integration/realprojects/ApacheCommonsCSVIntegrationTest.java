@@ -1,17 +1,17 @@
 package integration.realprojects;
 
-import integration.IntegrationBaseTest;
-import org.junit.Assert;
-import org.junit.Ignore;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import refactoringml.db.StableCommit;
-import refactoringml.db.RefactoringCommit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import integration.IntegrationBaseTest;
+import refactoringml.db.RefactoringCommit;
+import refactoringml.db.StableCommit;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
+class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
     @Override
     protected String getLastCommit() {
         return "70092bb303af69b09bf3978b24c1faa87c909e3c";
@@ -28,7 +28,7 @@ public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
     // this test checks the Rename Parameter that has happened in #b58168683d01149a568734df21568ffcc41105fe,
     // method isSet
     @Test
-    public void randomRefactoring() {
+    void randomRefactoring() {
         // manually verified
         RefactoringCommit instance1 = getRefactoringCommits().stream().filter(commit ->
                 commit.getCommit().equals("b58168683d01149a568734df21568ffcc41105fe") &&
@@ -47,7 +47,7 @@ public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
 
     // this test follows the src/main/java/org/apache/commons/csv/CSVFormat.java file
     @Test
-    public void refactorings_CSVFormat() {
+    void refactorings_CSVFormat() {
         String fileName = "src/main/java/org/apache/commons/csv/CSVFormat.java";
         List<RefactoringCommit> refactoringCommitList = getRefactoringCommits().stream().filter(commit ->
                 commit.getFilePath().equals(fileName)).collect(Collectors.toList());
@@ -95,7 +95,7 @@ public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
 
     // this test follows the src/main/java/org/apache/commons/csv/CSVFormat.java file
     @Test
-    public void stable_CSVFormat() {
+    void stable_CSVFormat() {
         String fileName = "src/main/java/org/apache/commons/csv/CSVFormat.java";
         List<StableCommit> stableCommitListLevel2 = getStableCommits().stream().filter(commit ->
                 commit.getFilePath().equals(fileName) && commit.getLevel() == 2).collect(Collectors.toList());
@@ -124,7 +124,7 @@ public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void refactorings_CSVStrategy() {
+    void refactorings_CSVStrategy() {
         String fileName = "src/main/java/org/apache/commons/csv/CSVStrategy.java";
         // and 10 with the old name 'CSVStrategy.java'
         List<RefactoringCommit> refactoringCommitList = getRefactoringCommits().stream().filter(commit ->
@@ -141,17 +141,10 @@ public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
     }
 
     @Test
-    public void stable_CSVStrategy() {
+    void stable_CSVStrategy() {
         String fileName = "src/main/java/org/apache/commons/csv/CSVStrategy.java";
         List<StableCommit> stableCommitList = getStableCommits().stream().filter(commit ->
                 commit.getFilePath().equals(fileName)).collect(Collectors.toList());
         Assert.assertEquals(0, stableCommitList.size());
-    }
-
-    // check the number of test and production files as well as their LOC
-    @Test
-    @Ignore
-    public void projectMetrics() {
-        //assertProjectMetrics(35, 12, 23, 7020, 1880, 5140);
     }
 }

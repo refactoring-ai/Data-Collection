@@ -1,16 +1,17 @@
 package integration.realprojects;
 
-import integration.IntegrationBaseTest;
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import refactoringml.db.RefactoringCommit;
-import refactoringml.db.StableCommit;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import integration.IntegrationBaseTest;
+import refactoringml.db.RefactoringCommit;
+import refactoringml.db.StableCommit;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
+class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	@Override
 	protected String getStableCommitThreshold() {return "10";};
 
@@ -26,7 +27,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 
 	//Test the isInnerClass boolean for both RefactoringCommit and StableCommit .
 	@Test
-	public void isInnerClassRefactoring(){
+	void isInnerClassRefactoring(){
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits().stream().filter(commit -> commit.getClassName().equals("org.apache.commons.cli.HelpFormatter")||
 				commit.getClassName().equals("org.apache.commons.cli.HelpFormatter.StringBufferComparator")).collect(Collectors.toList());
 
@@ -41,7 +42,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void isInnerClassStable(){
+	void isInnerClassStable(){
 		List<StableCommit> areInnerClassesInStable = getStableCommits().stream().filter(commit ->
 				commit.getClassMetrics().isInnerClass()).collect(Collectors.toList());
 		Assert.assertEquals(43, areInnerClassesInStable.size());
@@ -54,7 +55,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void isInnerClassStable2(){
+	void isInnerClassStable2(){
 		List<StableCommit> areInnerClassesInStableLevel2 = getStableCommits().stream().filter(commit ->
 				commit.getClassMetrics().isInnerClass() && commit.getLevel() == 2).collect(Collectors.toList());
 		Assert.assertEquals(6, areInnerClassesInStableLevel2.size());
@@ -73,7 +74,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitCount(){
+	void commitCount(){
 		String helpFormatterClass = "org.apache.commons.cli.HelpFormatter";
 		String extractMethod = "c7127329dad2c5d6284532da09ddc0fdefd67436";
 		RefactoringCommit extractMethodRefactoring = (RefactoringCommit) filterCommit(getRefactoringCommits(), extractMethod).stream()
@@ -94,7 +95,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	//Test if the inner classes are tracked and marked correctly, with all details
 	//This test requires multipleKs to work
 	@Test
-	public void isInnerClassDetails1() {
+	void isInnerClassDetails1() {
 		assertInnerClass(
 				getStableCommits(),
 				"38ab386d9d86c6cacea817954064bb25fba312aa",
@@ -103,7 +104,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void isInnerClassDetails2() {
+	void isInnerClassDetails2() {
 		//org.apache.commons.cli.HelpFormatter:
 		//Refactoring at:
 		// 8f8639f6a2606f45c130d7d9b65248248fc431c1
@@ -127,7 +128,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void isInnerClassDetails3() {
+	void isInnerClassDetails3() {
 		assertInnerClass(
 				getStableCommits(),
 				"cd745ecf52fb2fe8fed1c67fc9149e4be11a73f0",
@@ -141,7 +142,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitMetaDataRefactoring(){
+	void commitMetaDataRefactoring(){
 		String renameCommit = "04490af06faa8fd1be15da88172beb32218dd336";
 		assertMetaDataRefactoring(
 				renameCommit,
@@ -168,7 +169,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void commitMetaDataStable(){
+	void commitMetaDataStable(){
 		String stableCommit1 = "aae50c585ec3ac33c6a9af792e80378904a73195";
 		assertMetaDataStable(
 				stableCommit1,
@@ -195,7 +196,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	// this test checks the Extract Method that has happened in #269eae18a911f792895d0402f5dd4e7913410523,
 	// method getParsedOptionValue
 	@Test
-	public void refactoringDetected1() {
+	void refactoringDetected1() {
 		RefactoringCommit instance1 = getRefactoringCommits().stream().filter(commit ->
 				commit.getCommit().equals("269eae18a911f792895d0402f5dd4e7913410523") &&
 						commit.getRefactoring().equals("Extract Method") &&
@@ -215,7 +216,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	// This test helped us to understand that we should not delete
 	// RefactoringCommit where variableAppearances = -1, as this happens in newly introduced variables.
 	@Test
-	public void refactoringOptionClass() {
+	void refactoringOptionClass() {
 		// it has been through 9 different refactorings
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits().stream().filter(commit ->
 				commit.getFilePath().equals("src/java/org/apache/commons/cli/Option.java")).collect(Collectors.toList());
@@ -230,7 +231,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void stableOptionClass(){
+	void stableOptionClass(){
 		List<StableCommit> stableCommitList = getStableCommits().stream().filter(commit ->
 				commit.getFilePath().equals("src/java/org/apache/commons/cli/Option.java")).collect(Collectors.toList());
 
@@ -238,14 +239,14 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void stableCommitsClasses(){
+	void stableCommitsClasses(){
 		List<String> noListUnique = getStableCommits().stream().map(instance -> instance.getClassName()).distinct().collect(Collectors.toList());
 		Assert.assertEquals(43, noListUnique.size());
 	}
 
 	// test if test files are marked as tests, and production files are not
 	@Test
-	public void isTest() {
+	void isTest() {
 		// it has been through 9 different refactorings
 		List<String> refactoringCommitsTests = getRefactoringCommits().stream().filter(refactoring -> refactoring.getIsTest()).map(
 				refactoringCommit -> refactoringCommit.getClassName()).distinct().collect(Collectors.toList());
@@ -260,10 +261,5 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 				refactoringCommit -> refactoringCommit.getClassName()).distinct().collect(Collectors.toList());
 		Assert.assertEquals(16, stableCommitListTests.size());
 		Assert.assertEquals(27, stableCommitListNoTests.size());
-	}
-
-	@Test
-	public void projectMetrics() {
-		assertProjectMetrics(52, 23, 29, 7078, 2793, 4285);
 	}
 }

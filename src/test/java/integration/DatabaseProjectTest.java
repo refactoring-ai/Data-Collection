@@ -1,38 +1,39 @@
 package integration;
 
-import org.apache.commons.io.FileUtils;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
-import org.junit.jupiter.api.*;
-import refactoringml.App;
-import refactoringml.db.Database;
-import refactoringml.db.HibernateConfig;
-import refactoringml.db.Project;
+import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static refactoringml.util.FileUtils.createTmpDir;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import static org.junit.Assert.assertThrows;
-import static org.junit.Assert.assertTrue;
-import static refactoringml.util.FileUtils.createTmpDir;
+import org.apache.commons.io.FileUtils;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import refactoringml.App;
+import refactoringml.db.Database;
+import refactoringml.db.HibernateConfig;
+import refactoringml.db.Project;
 
 /*
     Test if a project can be added twice to a database both for the Single and Queue version of the data collection.
  */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class DatabaseProjectTest{
-    private final String repo1 = "repos/r1";
-    private final String repo2 = "repos/r2";
+class DatabaseProjectTest {
+    private final String repo1 = "https://github.com/refactoring-ai-testing/toyrepo-r1.git";
+    private final String repo2 = "https://github.com/refactoring-ai-testing/toyrepo-r2.git";
 
     private String outputDir;
     private String tmpDir;
 
-    private final String URL = "jdbc:mysql://localhost:3306/test";
-    private final String USER = "root";
-    private final String PASSWORD = "refactoring";
-
-    private Database db;
     private SessionFactory sf;
 
     @BeforeAll
@@ -40,12 +41,7 @@ public class DatabaseProjectTest{
         outputDir = createTmpDir();
         tmpDir = createTmpDir();
 
-        sf = HibernateConfig.getSessionFactory(URL, USER, PASSWORD, false);
-    }
-
-    @BeforeEach
-    void openSession() {
-        db = new Database(sf.openSession());
+        sf = HibernateConfig.getSessionFactory(DataBaseInfo.URL, DataBaseInfo.USER, DataBaseInfo.PASSWORD, false);
     }
 
     @AfterEach
@@ -66,50 +62,47 @@ public class DatabaseProjectTest{
         try {
             Session session = sf.openSession();
 
-
             List<Project> projects = (List<Project>) session.createQuery("from Project p where p.gitUrl = :gitUrl")
                     .setParameter("gitUrl", repo1).list();
 
-            if(!projects.isEmpty()) {
+            if (!projects.isEmpty()) {
                 session.beginTransaction();
 
                 session.createQuery("delete from RefactoringCommit y where project in :project")
-                        .setParameter("project", projects)
-                        .executeUpdate();
+                        .setParameter("project", projects).executeUpdate();
                 session.createQuery("delete from StableCommit where project in :project")
-                        .setParameter("project", projects)
-                        .executeUpdate();
+                        .setParameter("project", projects).executeUpdate();
 
                 projects.stream().forEach(session::delete);
                 session.getTransaction().commit();
             }
 
-
             session.close();
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println("Could not delete the project before starting the test");
             e.printStackTrace();
         }
     }
 
     /*
-        Test if two different projects are processed.
-    */
+     * Test if two different projects are processed.
+     */
     @Test
-    public void different() throws Exception {
-        new App("repo1", repo1, outputDir, db, false).run();
-        new App("repo2", repo2, outputDir, db, false).run();
+    void different() throws Exception {
+        assertNotNull(new App("repo1", repo1, outputDir, new Database(sf.openSession()), false).run());
+        assertNotNull(new App("repo2", repo2, outputDir, new Database(sf.openSession()), false).run());
     }
 
     /*
-        Test if the same project is not processed twice.
-    */
+     * Test if the same project is not processed twice.
+     */
     @Test
-    public void twice() throws Exception {
-        new App("repo1", repo1, outputDir, db, false).run();
+    void twice() throws Exception {
+        new App("repo1", repo1, outputDir, new Database(sf.openSession()), false).run();
+        App app = new App("repo1", repo1, outputDir, new Database(sf.openSession()), false);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new App("repo1", repo1, outputDir, db, false).run();
+            app.run();
         });
         String expectedMessage = "already in the database";
         String passedMessage = exception.getMessage();
@@ -117,16 +110,15 @@ public class DatabaseProjectTest{
     }
 
     /*
-        Test if the same project is not processed twice.
-        TODO: check why it is failing. Probably because if you run all the tests together,
-        one of the repos might be there already...
-    */
-    @Test @Disabled
-    public void alternating() throws Exception {
-        new App("repo1", repo1, outputDir, db, false).run();
-        new App("repo2", repo2, outputDir, db, false).run();
+     * Test if the same project is not processed twice.
+     */
+    @Test
+    void alternating() throws Exception {
+        new App("repo1", repo1, outputDir, new Database(sf.openSession()), false).run();
+        new App("repo2", repo2, outputDir, new Database(sf.openSession()), false).run();
+        App repeatedApp = new App("repo1", repo1, outputDir, new Database(sf.openSession()), false);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
-            new App("repo1", repo1, outputDir, db, false).run();
+            repeatedApp.run();
         });
         String expectedMessage = "already in the database";
         String passedMessage = exception.getMessage();

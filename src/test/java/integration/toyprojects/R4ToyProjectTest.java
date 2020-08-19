@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R4ToyProjectTest extends IntegrationBaseTest {
+class R4ToyProjectTest extends IntegrationBaseTest {
 
 	@Override
 	protected String getRepo() {
@@ -20,13 +20,13 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void refactorings() {
+	void refactorings() {
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		Assert.assertEquals(7, refactoringCommitList.size());
 	}
 
 	@Test
-	public void refactoringDetails(){
+	void refactoringDetails(){
 		String extractCommit = "dd9aa00b03c9456c69c5e6566040fb994d7c9d98";
 		String renameCommit = "104e39574462f9e4bd6b1cdf388ecd0334a6f2c3";
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits().stream().filter(commit ->
@@ -43,7 +43,7 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void isSubclass(){
+	void isSubclass(){
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		Assert.assertEquals(7, refactoringCommitList.size());
 
@@ -56,7 +56,7 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void stable() {
+	void stable() {
 		// there are no instances of stable variables, as the repo is too small
 		Assert.assertEquals(0, getStableCommits().size());
 	}
@@ -66,7 +66,7 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 	Between the two commits: rename class and full rename, the file name of the affected class was changed as well in one commit.
 	 */
 	@Test
-	public void classRenames(){
+	void classRenames(){
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits().stream().filter(commit -> commit.getRefactoring().equals("Rename Class")).collect(Collectors.toList());
 		Assert.assertEquals(4, refactoringCommitList.size());
 
@@ -77,7 +77,6 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 		//renamed both class name and filename
 		String renameClassFull = "d801d80c03ff1268010bbb43cec43da4be233dfd";
 		//renamed only the file name and not the class name
-		String renameFile = "9f3da34dc0cf4a141033d47accdb338104678f9b";
 
 		assertRefactoring(refactoringCommitList, doubleRenameCommit, "Rename Class",2);
 		assertRefactoring(refactoringCommitList, renameClass, "Rename Class",1);
@@ -140,11 +139,12 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 		assertProcessMetrics(filterCommit(refactoringCommitList, renameClassFull).get(0), renameFullMetrics);
 
 		//TODO: does refactoring miner miss file name rename refactorings, with no effects on the class?
-		//assertRefactoring(refactoringCommitList, renameFile, "Rename Class",1);
+		// String renameFile = "9f3da34dc0cf4a141033d47accdb338104678f9b";
+		// assertRefactoring(refactoringCommitList, renameFile, "Rename Class",1);
 	}
 
 	@Test
-	public void commitMetaData(){
+	void commitMetaData(){
 		String commit = "dd9aa00b03c9456c69c5e6566040fb994d7c9d98";
 		assertMetaDataRefactoring(
 				commit,
@@ -156,7 +156,7 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void renames(){
+	void renames(){
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		String methodExtract = ProcessMetrics.toString(
 				1,
@@ -186,7 +186,7 @@ public class R4ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void projectMetrics() {
+	void projectMetrics() {
 		assertProjectMetrics(3, 1, 2, 148, 21, 127);
 	}
 }

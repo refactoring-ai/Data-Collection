@@ -10,7 +10,7 @@ import refactoringml.db.RefactoringCommit;
 import java.util.List;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R5ToyProjectTest extends IntegrationBaseTest {
+class R5ToyProjectTest extends IntegrationBaseTest {
 
 	@Override
 	protected String getRepo() {
@@ -19,7 +19,7 @@ public class R5ToyProjectTest extends IntegrationBaseTest {
 
 	// this test was to see whether the tool would collect classes with generics
 	@Test
-	public void refactorings() {
+	void refactorings() {
 
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		Assert.assertEquals(1, refactoringCommitList.size());
@@ -33,14 +33,14 @@ public class R5ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void stable() {
+	void stable() {
 		// there are no instances of stable variables, as the repo is too small
 		List<StableCommit> stableCommitList = getStableCommits();
 		Assert.assertEquals(0, stableCommitList.size());
 	}
 
 	@Test
-	public void commitMetaData(){
+	void commitMetaData(){
 		String commit = "31820e9d172ba571d93de14733101f8cb81853e8";
 		assertMetaDataRefactoring(
 				commit,
@@ -52,7 +52,7 @@ public class R5ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void projectMetrics() {
+	void projectMetrics() {
 		assertProjectMetrics(1, 0, 1, 19, 0, 19);
 	}
 }

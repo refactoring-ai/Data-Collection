@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.junit.Assert;
-import org.junit.Ignore;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import refactoringml.db.CommitMetaData;
@@ -27,7 +27,7 @@ class PMDatabaseTest {
 
     // Test the case sensitivity of class fileNames
     // Be aware: .Java and .java are equal for java
-    @Ignore
+    @Disabled
     @Test
     void caseSensitivity() {
         PMDatabase pmDatabase = new PMDatabase();

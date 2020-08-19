@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R2ToyProjectTest extends IntegrationBaseTest {
+class R2ToyProjectTest extends IntegrationBaseTest {
 	@Override
 	protected String getRepo() {
 		return "https://github.com/refactoring-ai-testing/toyrepo-r2.git";
@@ -20,7 +20,7 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 	// This test helped us to realize (again) that when class name and file name don't match, we can't link the
 	// refactoring. We opened a PR in RefactoringMiner; now it works!
 	@Test
-	public void refactorings() {
+	void refactorings() {
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		Assert.assertEquals(10, refactoringCommitList.size());
 
@@ -43,7 +43,7 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void isSubclass() {
+	void isSubclass() {
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		Assert.assertEquals(10, refactoringCommitList.size());
 
@@ -57,14 +57,14 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void stable() {
+	void stable() {
 		// there are no instances of stable variables, as the repo is too small
 		List<StableCommit> stableCommitList = getStableCommits();
 		Assert.assertEquals(0, stableCommitList.size());
 	}
 
 	@Test
-	public void commitMetaData(){
+	void commitMetaData(){
 		String commit = "bc15aee7cfaddde19ba6fefe0d12331fe98ddd46";
 		assertMetaDataRefactoring(
 				commit,
@@ -76,7 +76,7 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 	}
 
 	@Test
-	public void classCohesion(){
+	void classCohesion(){
 		String commit = "a03a3d71f7838cf964551fdc2be22b37fe9a35e6";
 		List<RefactoringCommit> refactoringCommitList = getRefactoringCommits();
 		RefactoringCommit lastRefactoring = refactoringCommitList.stream().filter(refactoringCommit ->
@@ -84,9 +84,9 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 		Assert.assertEquals(365, lastRefactoring.getClassMetrics().getClassTCC());
 		Assert.assertEquals(1024, lastRefactoring.getClassMetrics().getClassLCC());
 	}
-
+	
 	@Test
-	public void projectMetrics() {
+	void projectMetrics() {
 		assertProjectMetrics(4, 3, 1, 64, 56, 8);
 	}
 }

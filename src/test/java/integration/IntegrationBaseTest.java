@@ -243,24 +243,24 @@ public abstract class IntegrationBaseTest {
 
 	//Test if all Refactorings were classified
 	@Test
-	public void refactoringLevel(){
+	void refactoringLevel(){
 		List<RefactoringCommit> refactoringCommitsNoLevel = getRefactoringCommits().stream().filter(refactoringCommit ->
 				refactoringCommit.getLevel() < 0).collect(Collectors.toList());
 		Assert.assertEquals(0, refactoringCommitsNoLevel.size());
 	}
 
 	@Test
-	public void checkExceptions() throws FileNotFoundException {
+	void checkExceptions() throws FileNotFoundException {
 		Assert.assertFalse(refactoringml.util.FileUtils.readFile("./logs/data-collection_test_ERROR.log").contains("Exception: "));
 	}
 
 	@Test
-	public void checkCKMethodNotFound() throws FileNotFoundException {
+	void checkCKMethodNotFound() throws FileNotFoundException {
 		Assert.assertFalse(refactoringml.util.FileUtils.readFile("./logs/data-collection_test_ERROR.log").contains("CK did not find the refactored method:"));
 	}
 
 	@Test
-	public void monitorDuplicateStableInstances(){
+	void monitorDuplicateStableInstances(){
 		String query = "SELECT COUNT(*) FROM (SELECT DISTINCT s.className, s.filePath, s.isTest, s.level, s.commitThreshold, s.classMetrics_id, s.commitMetaData_id, s.fieldMetrics_id, s.methodMetrics_id, s.processMetrics_id, s.project_id, s.variableMetrics_id From StableCommit s where s.project_id = " + project.getId() + ") t";
 		Object result = session.createSQLQuery(query).getSingleResult();
 		int uniqueStableCommits = Integer.parseInt(result.toString());
@@ -268,7 +268,7 @@ public abstract class IntegrationBaseTest {
 	}
 
 	@Test
-	public void monitorDuplicateRefactoringInstances(){
+	void monitorDuplicateRefactoringInstances(){
 		String query = "SELECT COUNT(*) FROM (SELECT DISTINCT s.refactoring, s.refactoringSummary, s.className, s.filePath, s.isTest, s.level, s.classMetrics_id, s.commitMetaData_id, s.fieldMetrics_id, s.methodMetrics_id, s.processMetrics_id, s.project_id, s.variableMetrics_id From RefactoringCommit s where s.isValid = TRUE AND s.project_id = " + project.getId() + ") t";
 		Object result = session.createSQLQuery(query).getSingleResult();
 		int uniqueRefactoringCommits = Integer.parseInt(result.toString());
@@ -277,7 +277,7 @@ public abstract class IntegrationBaseTest {
 
 	//Test if we have invalid or redundant commit-metadata collected
 	@Test
-	public void relevantCommitMetaData(){
+	void relevantCommitMetaData(){
 		List<String> allRelevantCommitIds = session.createQuery("SELECT DISTINCT r.commitMetaData.commitId FROM RefactoringCommit r WHERE r.isValid = TRUE").list();
 		allRelevantCommitIds.addAll(session.createQuery("SELECT DISTINCT s.commitMetaData.commitId FROM StableCommit s").list());
 		allRelevantCommitIds = allRelevantCommitIds.stream().distinct().collect(Collectors.toList());

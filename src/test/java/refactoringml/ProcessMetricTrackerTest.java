@@ -1,16 +1,17 @@
 package refactoringml;
 
-import org.junit.Assert;
-import org.junit.Test;
 import refactoringml.db.CommitMetaData;
 import refactoringml.db.ProcessMetrics;
 
 import java.util.List;
 import java.util.Random;
 
+import org.junit.Assert;
+import org.junit.jupiter.api.Test;
+
 //Tests the ProcessMetricTracker and ProcessMetrics classes
 //Closely linked to PMDatabaseTest
-public class ProcessMetricTrackerTest {
+class ProcessMetricTrackerTest {
 	//Test if the constructor of the ProcessMetricTracker works as intended
 	@Test
 	public void constructor(){
@@ -30,7 +31,7 @@ public class ProcessMetricTrackerTest {
 
 	//test if the ProcessMetricTracker reportCommit function behaves as expected
 	@Test
-	public void reportCommit(){
+	void reportCommit(){
 		CommitMetaData commitMetaData = new CommitMetaData();
 		ProcessMetricTracker pm = new ProcessMetricTracker("a.Java", commitMetaData);
 
@@ -57,7 +58,7 @@ public class ProcessMetricTrackerTest {
 
 	//test if the ProcessMetricTracker reset function behaves as expected
 	@Test
-	public void resetClassFile(){
+	void resetClassFile(){
 		CommitMetaData commitMetaData = new CommitMetaData();
 		ProcessMetricTracker pm = new ProcessMetricTracker("a.Java", commitMetaData);
 
@@ -91,7 +92,7 @@ public class ProcessMetricTrackerTest {
 	}
 
 	@Test
-	public void authorOwnership() {
+	void authorOwnership() {
 		//TODO: What commit message should I use here?
 		ProcessMetricTracker pm = new ProcessMetricTracker("a.Java", new CommitMetaData());
 
@@ -136,7 +137,7 @@ public class ProcessMetricTrackerTest {
 	}
 
 	@Test
-	public void countBugFixes() {
+	void countBugFixes() {
 		int qtyKeywords = ProcessMetricTracker.bugKeywords.length;
 		Random rnd = new Random();
 
@@ -159,7 +160,7 @@ public class ProcessMetricTrackerTest {
 	}
 
 	@Test
-	public void countQtyOfCommits(){
+	void countQtyOfCommits(){
 		PMDatabase pmDatabase = new PMDatabase();
 
 		for(int i = 0; i < 20; i++) {
@@ -179,7 +180,7 @@ public class ProcessMetricTrackerTest {
 	}
 
 	@Test
-	public void calculateStability(){
+	void calculateStability(){
 		ProcessMetricTracker pm = new ProcessMetricTracker("a.Java", new CommitMetaData());
 		List<Integer> stableCommitCounts = List.of(10, 25);
 

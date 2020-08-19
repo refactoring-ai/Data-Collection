@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import refactoringml.util.RefactoringUtils;
 
-public class RefactoringUtilsTest {
+class RefactoringUtilsTest {
 
 	@Test
 	void identifyAnonymousClassesOrMethods() {

@@ -1,15 +1,5 @@
 package integration.toyprojects;
 
-import integration.IntegrationBaseTest;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.lib.Repository;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
-import refactoringml.db.RefactoringCommit;
-import refactoringml.util.FileUtils;
-
-import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,11 +9,17 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static refactoringml.util.JGitUtils.extractProjectNameFromGitUrl;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.TestInstance;
+
+import integration.IntegrationBaseTest;
+import refactoringml.db.RefactoringCommit;
+import refactoringml.util.FileUtils;
 
 // tests related to PR #128: https://github.com/refactoring-ai/predicting-refactoring-ml/pull/128
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class R6ToyProjectTest extends IntegrationBaseTest {
+class R6ToyProjectTest extends IntegrationBaseTest {
 
 	@Override
 	protected String getRepo() {
@@ -177,13 +173,6 @@ public class R6ToyProjectTest extends IntegrationBaseTest {
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private Repository getRepository() throws IOException {
-		String projectName = extractProjectNameFromGitUrl(getRepo());
-		String repoLocalDir = "repos/" + projectName;
-		Git git = Git.open(new File(repoLocalDir));
-		return git.getRepository();
 	}
 
 }
