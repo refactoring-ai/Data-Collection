@@ -172,10 +172,16 @@ public class ProcessMetricsCollector {
 
 			// print its process metrics in the same process metrics file
 			// note that we print the process metrics back then (X commits ago)
-			for(StableCommit stableCommit : stableCommits) {
-				stableCommit.setProcessMetrics(new ProcessMetrics(pmTracker.getBaseProcessMetrics()));
-				db.persist(stableCommit);
+			if(stableCommits.size() > 0){
+				//don't store duplicate entries of the same process metrics
+				ProcessMetrics processMetrics = new ProcessMetrics(pmTracker.getBaseProcessMetrics());
+				db.persist(processMetrics);
+				for(StableCommit stableCommit : stableCommits) {
+					stableCommit.setProcessMetrics(processMetrics);
+					db.persist(stableCommit);
+				}
 			}
+
 		} catch(Exception e) {
 			log.error(e.getClass().getCanonicalName() + " while processing stable process metrics." + createErrorState(pmTracker.getBaseCommitMetaData().getCommitId(), project), e);
 		} finally {
