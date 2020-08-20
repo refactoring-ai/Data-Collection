@@ -44,20 +44,20 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 	public void isInnerClassStable(){
 		List<StableCommit> areInnerClassesInStable = getStableCommits().stream().filter(commit ->
 				commit.getClassMetrics().isInnerClass()).collect(Collectors.toList());
-		Assert.assertEquals(43, areInnerClassesInStable.size());
+		Assert.assertEquals(65, areInnerClassesInStable.size());
 
 		List<StableCommit> areNotInnerClassesInStable = getStableCommits().stream().filter(commit ->
 				!commit.getClassMetrics().isInnerClass()).collect(Collectors.toList());
-		Assert.assertEquals(1702, areNotInnerClassesInStable.size());
+		Assert.assertEquals(2195, areNotInnerClassesInStable.size());
 
-		Assert.assertEquals(1745, getStableCommits().size());
+		Assert.assertEquals(2260, getStableCommits().size());
 	}
 
 	@Test
 	public void isInnerClassStable2(){
 		List<StableCommit> areInnerClassesInStableLevel2 = getStableCommits().stream().filter(commit ->
 				commit.getClassMetrics().isInnerClass() && commit.getLevel() == 2).collect(Collectors.toList());
-		Assert.assertEquals(6, areInnerClassesInStableLevel2.size());
+		Assert.assertEquals(22, areInnerClassesInStableLevel2.size());
 
 		List<StableCommit> areInnerClassesInStableLevel3 = getStableCommits().stream().filter(commit ->
 				commit.getClassMetrics().isInnerClass() && commit.getLevel() == 3).collect(Collectors.toList());
@@ -65,7 +65,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 
 		List<StableCommit> areNotInnerClassesInStableLevel2 = getStableCommits().stream().filter(commit ->
 				!commit.getClassMetrics().isInnerClass() && commit.getLevel() == 2).collect(Collectors.toList());
-		Assert.assertEquals(169, areNotInnerClassesInStableLevel2.size());
+		Assert.assertEquals(610, areNotInnerClassesInStableLevel2.size());
 
 		List<StableCommit> areNotInnerClassesInStableLevel3 = getStableCommits().stream().filter(commit ->
 				!commit.getClassMetrics().isInnerClass() && commit.getLevel() == 3).collect(Collectors.toList());
@@ -99,7 +99,7 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 				getStableCommits(),
 				"38ab386d9d86c6cacea817954064bb25fba312aa",
 				"org.apache.commons.cli.Option.Builder",
-				24);
+				35);
 	}
 
 	@Test
@@ -113,17 +113,17 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 				getStableCommits(),
 				"8f95e4a724350f9f80429c2af1c3ac9bb2b2c2db",
 				"org.apache.commons.cli.HelpFormatter.OptionComparator",
-				4);
+				6);
 		assertInnerClass(
 				getStableCommits(),
 				"51f4ee70a4f5a8a921557b2a53413fb19c52b918",
 				"org.apache.commons.cli.HelpFormatter.OptionComparator",
-				4);
+				6);
 		assertInnerClass(
 				getStableCommits(),
 				"3936da9d3fe37bcd20dd37216d82608e5917be07",
 				"org.apache.commons.cli.HelpFormatter.OptionComparator",
-				2);
+				4);
 	}
 
 	@Test
@@ -132,12 +132,12 @@ public class ApacheCommonsCliIntegrationTest extends IntegrationBaseTest {
 				getStableCommits(),
 				"cd745ecf52fb2fe8fed1c67fc9149e4be11a73f0",
 				"org.apache.commons.cli.OptionTest.TestOption",
-				4);
+				7);
 		assertInnerClass(
 				getStableCommits(),
 				"cd745ecf52fb2fe8fed1c67fc9149e4be11a73f0",
 				"org.apache.commons.cli.OptionTest.DefaultOption",
-				5);
+				7);
 	}
 
 	@Test
