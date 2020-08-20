@@ -214,23 +214,18 @@ public class ProcessMetricsCollector {
 					stableCommits.add(stableCommitV);
 				}
 
-				//only add this if there are no variable refactorings
-				if(variables.isEmpty()){
-					StableCommit stableCommitM = new StableCommit(
-							project,
-							commitMetaData,
-							enforceUnixPaths(ck.getFile()).replace(tempDir, ""),
-							cleanedCkClassName,
-							classMetric,
-							methodMetrics,
-							null,
-							null,
-							RefactoringUtils.Level.METHOD.ordinal(),
-							commitThreshold);
-
-					stableCommits.add(stableCommitM);
-
-				}
+				StableCommit stableCommitM = new StableCommit(
+						project,
+						commitMetaData,
+						enforceUnixPaths(ck.getFile()).replace(tempDir, ""),
+						cleanedCkClassName,
+						classMetric,
+						methodMetrics,
+						null,
+						null,
+						RefactoringUtils.Level.METHOD.ordinal(),
+						commitThreshold);
+				stableCommits.add(stableCommitM);
 			}
 
 			Set<String> fields = ck.getMethods().stream().flatMap(x -> x.getFieldUsage().keySet().stream()).collect(Collectors.toSet());
@@ -256,22 +251,18 @@ public class ProcessMetricsCollector {
 				stableCommits.add(stableCommitF);
 			}
 
-			//only add this if there are not method- and field level refactorings
-			if(methods.isEmpty() && fields.isEmpty()){
-				StableCommit stableCommit = new StableCommit(
-						project,
-						commitMetaData,
-						enforceUnixPaths(ck.getFile()).replace(tempDir, ""),
-						cleanedCkClassName,
-						classMetric,
-						null,
-						null,
-						null,
-						RefactoringUtils.Level.CLASS.ordinal(),
-						commitThreshold);
-
-				stableCommits.add(stableCommit);
-			}
+			StableCommit stableCommit = new StableCommit(
+					project,
+					commitMetaData,
+					enforceUnixPaths(ck.getFile()).replace(tempDir, ""),
+					cleanedCkClassName,
+					classMetric,
+					null,
+					null,
+					null,
+					RefactoringUtils.Level.CLASS.ordinal(),
+					commitThreshold);
+			stableCommits.add(stableCommit);
 		});
 
 		return stableCommits;
