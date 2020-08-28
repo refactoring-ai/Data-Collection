@@ -100,7 +100,7 @@ public class ApacheCommonsCSVIntegrationTest extends IntegrationBaseTest {
         List<StableCommit> stableCommitListLevel2 = getStableCommits().stream().filter(commit ->
                 commit.getFilePath().equals(fileName) && commit.getLevel() == 2).collect(Collectors.toList());
 
-        Assert.assertEquals(17, stableCommitListLevel2.size());
+        Assert.assertEquals(43, stableCommitListLevel2.size());
 
         List<StableCommit> stableCommitListLevel3 = getStableCommits().stream().filter(commit ->
                 commit.getFilePath().equals(fileName) && commit.getLevel() == 3).collect(Collectors.toList());
