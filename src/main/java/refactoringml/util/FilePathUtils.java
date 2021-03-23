@@ -1,10 +1,12 @@
 package refactoringml.util;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import java.io.File;
 
 public class FilePathUtils {
+
+	private FilePathUtils() {
+		
+	}
 
 	public static String classFromFileName (String fileName) {
 		String[] splittedFile = enforceUnixPaths(fileName).replace("\\", "/").split("/");

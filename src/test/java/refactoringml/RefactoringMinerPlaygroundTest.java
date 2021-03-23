@@ -3,7 +3,7 @@ package refactoringml;
 import gr.uom.java.xmi.diff.RenameVariableRefactoring;
 import org.eclipse.jgit.api.Git;
 import org.junit.Ignore;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;

@@ -24,7 +24,6 @@ public class PMDatabase {
 
 	//Find all stable instances in the database
 	//Don't use these, because it is very inefficient
-	@Deprecated
 	public List<ProcessMetricTracker> findStableInstances(List<Integer> commitThresholds) {
 		return database.values().stream()
 				.filter(pmTracker -> pmTracker.calculateStability(commitThresholds))
@@ -42,7 +41,7 @@ public class PMDatabase {
 		ProcessMetricTracker pmTracker = new ProcessMetricTracker(database.getOrDefault(oldFileName, new ProcessMetricTracker(newFileName, commitMetaData)));
 		if(oldFileName.equals(newFileName)){
 			throw new IllegalArgumentException("The old and new file name for a rename refactoring are both: " + oldFileName
-					+ LogUtils.createRefactoringErrorState(commitMetaData.getCommitId(), "Rename Refactoring"));
+					+ LogUtils.createRefactoringErrorState(commitMetaData.commitId, "Rename Refactoring"));
 		}
 		//If a filename already exists in the database, overwrite the process metrics with the ones from this refactoring
 		pmTracker.setFileName(newFileName);
@@ -62,7 +61,7 @@ public class PMDatabase {
 	//Returns the ProcessMetricsTracker if it is stable
 	public ProcessMetricTracker reportChanges(String fileName, CommitMetaData commitMetaData, String authorName, int linesAdded, int linesDeleted) {
 		ProcessMetricTracker pmTracker = database.getOrDefault(fileName, new ProcessMetricTracker(fileName, commitMetaData));
-		pmTracker.reportCommit(commitMetaData.getCommitMessage(), authorName, linesAdded, linesDeleted);
+		pmTracker.reportCommit(commitMetaData.commitMessage, authorName, linesAdded, linesDeleted);
 
 		database.put(fileName, pmTracker);
 		return pmTracker;

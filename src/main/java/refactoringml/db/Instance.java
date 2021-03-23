@@ -1,60 +1,65 @@
 package refactoringml.db;
 
-import javax.persistence.*;
+import static refactoringml.util.FileUtils.isTestFile;
 
-import static refactoringml.util.FilePathUtils.enforceUnixPaths;
-import static refactoringml.util.FileUtils.IsTestFile;
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.MappedSuperclass;
+
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
 //Base class for all commits saved in the DB
 @MappedSuperclass
-public abstract class Instance {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    protected long id;
+public abstract class Instance extends PanacheEntity {
 
-    @ManyToOne
-    //project id: referencing the project information, e.g. name or gitUrl
-    protected Project project;
+    @ManyToOne(cascade = CascadeType.REMOVE)
+    @JoinColumn(nullable = false)
+    // project id: referencing the project information, e.g. name or gitUrl
+    public Project project;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    protected CommitMetaData commitMetaData;
+    public CommitMetaData commitMetaData;
 
-    //relative filepath to the java file of the class file
-    @Column(columnDefinition="TEXT")
-    protected String filePath;
-    //name of the class, @Warning: might differ from the filename
-    protected String className;
-    //is this commit affecting a test?
-    protected boolean isTest;
+    // relative filepath to the java file of the class file
+    @Column(columnDefinition = "TEXT")
+    public String filePath;
+    // name of the class, @Warning: might differ from the filename
+    public String className;
+    // is this commit affecting a test?
+    public boolean isTest;
 
-    //Describes the level of the class being affected, e.g. class level or method level refactoring
-    //For a mapping see: RefactoringUtils
-    //TODO: make this an enum, for better readibility
-    private int level;
-
-    @ManyToOne(cascade = CascadeType.ALL)
-    protected ClassMetric classMetrics;
+    // Describes the level of the class being affected, e.g. class level or method
+    // level refactoring
+    // For a mapping see: RefactoringUtils
+    // TODO: make this an enum, for better readibility
+    public int level;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    protected MethodMetric methodMetrics;
+    public ClassMetric classMetrics;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    protected VariableMetric variableMetrics;
+    public MethodMetric methodMetrics;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    protected FieldMetric fieldMetrics;
+    public VariableMetric variableMetrics;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    protected ProcessMetrics processMetrics;
+    public FieldMetric fieldMetrics;
 
-    @Deprecated
-    public Instance(){}
+    @ManyToOne(cascade = CascadeType.ALL)
+    public ProcessMetrics processMetrics;
 
-    public Instance(Project project, CommitMetaData commitMetaData, String filePath, String className, ClassMetric classMetrics,
-                    MethodMetric methodMetrics, VariableMetric variableMetrics, FieldMetric fieldMetrics, int level) {
+    public Instance() {
+    }
+
+    public Instance(Project project, CommitMetaData commitMetaData, String filePath, String className,
+            ClassMetric classMetrics, MethodMetric methodMetrics, VariableMetric variableMetrics,
+            FieldMetric fieldMetrics, int level) {
         this.project = project;
         this.commitMetaData = commitMetaData;
-        this.filePath = enforceUnixPaths(filePath);
+        this.filePath = filePath;
         this.className = className;
         this.classMetrics = classMetrics;
         this.methodMetrics = methodMetrics;
@@ -62,51 +67,34 @@ public abstract class Instance {
         this.fieldMetrics = fieldMetrics;
         this.level = level;
 
-        this.isTest = IsTestFile(this.filePath);
+        this.isTest = isTestFile(filePath);
     }
 
-    public void setProcessMetrics(ProcessMetrics processMetrics) { this.processMetrics = processMetrics; }
+    public String getCommit() {
+        return commitMetaData.commitId;
+    }
 
-    public String getCommit() { return commitMetaData.getCommitId(); }
+    public String getClassName() {
+        return className;
+    }
 
-    public ProcessMetrics getProcessMetrics() { return processMetrics; }
+    public String getCommitMessage() {
+        return commitMetaData.commitMessage;
+    }
 
-    public MethodMetric getMethodMetrics() { return methodMetrics; }
-
-    public ClassMetric getClassMetrics() { return classMetrics; }
-
-    public FieldMetric getFieldMetrics() { return fieldMetrics; }
-
-    public VariableMetric getVariableMetrics() { return variableMetrics; }
-
-    public String getClassName() { return className; }
-
-    public String getCommitMessage() {return commitMetaData.getCommitMessage();}
-
-    public String getCommitUrl() {return commitMetaData.getCommitUrl();}
-
-    public boolean getIsTest() { return isTest; }
-
-    public String getFilePath() { return filePath; }
-
-    public int getLevel() { return level; }
-
-    public long getId() { return id; }
-
-    public CommitMetaData getCommitMetaData() { return commitMetaData; }
+    public String getCommitUrl() {
+        return commitMetaData.commitUrl;
+    }
 
     @Override
     public String toString() {
-        return
-                ", project=" + project +
-                ", commitMetaData=" + commitMetaData +
-                ", filePath='" + filePath + '\'' +
-                ", className='" + className + '\'' +
-                ", classMetrics=" + classMetrics +
-                ", methodMetrics=" + methodMetrics +
-                ", variableMetrics=" + variableMetrics +
-                ", fieldMetrics=" + fieldMetrics +
-                ", processMetrics=" + processMetrics +
-                ", level=" + level;
+        return ", project=" + project + ", commitMetaData=" + commitMetaData + ", filePath='" + filePath + '\''
+                + ", className='" + className + '\'' + ", classMetrics=" + classMetrics + ", methodMetrics="
+                + methodMetrics + ", variableMetrics=" + variableMetrics + ", fieldMetrics=" + fieldMetrics
+                + ", processMetrics=" + processMetrics + ", level=" + level;
+    }
+
+    public void merge() {
+        getEntityManager().merge(this);
     }
 }

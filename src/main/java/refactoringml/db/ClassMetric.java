@@ -2,56 +2,58 @@ package refactoringml.db;
 
 import javax.persistence.*;
 
+import io.quarkus.hibernate.orm.panache.PanacheEntity;
+
 @Entity
 @Table(name = "ClassMetric")
-public class ClassMetric {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
+public class ClassMetric extends PanacheEntity {
 
-	private boolean isInnerClass;
-	private int classCbo;
-	private int classWmc;
-	private int classRfc;
-	private int classLcom;
-	private int classTCC;
-	private int classLCC;
+	public boolean isInnerClass;
+	public int classCbo;
+	public int classWmc;
+	public int classRfc;
+	public int classLcom;
+	public int classTCC;
+	public int classLCC;
+	public int classNumberOfMethods;
+	public int classNumberOfStaticMethods;
+	public int classNumberOfPublicMethods;
+	public int classNumberOfPrivateMethods;
+	public int classNumberOfProtectedMethods;
+	public int classNumberOfDefaultMethods;
+	public int classNumberOfVisibleMethods;
+	public int classNumberOfAbstractMethods;
+	public int classNumberOfFinalMethods;
+	public int classNumberOfSynchronizedMethods;
+	public int classNumberOfFields;
+	public int classNumberOfStaticFields;
+	public int classNumberOfPublicFields;
+	public int classNumberOfPrivateFields;
+	public int classNumberOfProtectedFields;
+	public int classNumberOfDefaultFields;
+	public int classNumberOfFinalFields;
+	public int classNumberOfSynchronizedFields;
+	public int classNosi;
+	public int classLoc;
+	public int classReturnQty;
+	public int classLoopQty;
+	public int classComparisonsQty;
+	public int classTryCatchQty;
+	public int classParenthesizedExpsQty;
+	public int classStringLiteralsQty;
+	public int classNumbersQty;
+	public int classAssignmentsQty;
+	public int classMathOperationsQty;
+	public int classVariablesQty;
+	public int classMaxNestedBlocks;
+	public int classAnonymousClassesQty;
+	public int classSubClassesQty;
+	public int classLambdasQty;
+	public int classUniqueWordsQty;
 
-	private int classNumberOfMethods;
-	private int classNumberOfStaticMethods;
-	private int classNumberOfPublicMethods;
-	private int classNumberOfPrivateMethods;
-	private int classNumberOfProtectedMethods;
-	private int classNumberOfDefaultMethods;
-	private int classNumberOfVisibleMethods;
-	private int classNumberOfAbstractMethods;
-	private int classNumberOfFinalMethods;
-	private int classNumberOfSynchronizedMethods;
-	private int classNumberOfFields;
-	private int classNumberOfStaticFields;
-	private int classNumberOfPublicFields;
-	private int classNumberOfPrivateFields;
-	private int classNumberOfProtectedFields;
-	private int classNumberOfDefaultFields;
-	private int classNumberOfFinalFields;
-	private int classNumberOfSynchronizedFields;
-	private int classNosi;
-	private int classLoc;
-	private int classReturnQty;
-	private int classLoopQty;
-	private int classComparisonsQty;
-	private int classTryCatchQty;
-	private int classParenthesizedExpsQty;
-	private int classStringLiteralsQty;
-	private int classNumbersQty;
-	private int classAssignmentsQty;
-	private int classMathOperationsQty;
-	private int classVariablesQty;
-	private int classMaxNestedBlocks;
-	private int classAnonymousClassesQty;
-	private int classSubClassesQty;
-	private int classLambdasQty;
-	private int classUniqueWordsQty;
+	@ManyToOne(cascade = CascadeType.REMOVE)
+	@JoinColumn(nullable = false)
+	public Project project;
 
 	@Deprecated // hibernate purposes
 	public ClassMetric(){}
@@ -60,7 +62,7 @@ public class ClassMetric {
 	                   int classNumberOfDefaultMethods, int classNumberOfVisibleMethods, int classNumberOfAbstractMethods, int classNumberOfFinalMethods, int classNumberOfSynchronizedMethods, int classNumberOfFields, int classNumberOfStaticFields,
 	                   int classNumberOfPublicFields, int classNumberOfPrivateFields, int classNumberOfProtectedFields, int classNumberOfDefaultFields, int classNumberOfFinalFields, int classNumberOfSynchronizedFields,
 	                   int classNosi, int classLoc, int classReturnQty, int classLoopQty, int classComparisonsQty, int classTryCatchQty, int classParenthesizedExpsQty, int classStringLiteralsQty, int classNumbersQty, int classAssignmentsQty,
-	                   int classMathOperationsQty, int classVariablesQty, int classMaxNestedBlocks, int classAnonymousClassesQty, int classSubClassesQty, int classLambdasQty, int classUniqueWordsQty) {
+	                   int classMathOperationsQty, int classVariablesQty, int classMaxNestedBlocks, int classAnonymousClassesQty, int classSubClassesQty, int classLambdasQty, int classUniqueWordsQty, Project project) {
 		this.isInnerClass = isInnerClass;
 		this.classCbo = classCbo;
 		this.classWmc = classWmc;
@@ -103,6 +105,7 @@ public class ClassMetric {
 		this.classSubClassesQty = classSubClassesQty;
 		this.classLambdasQty = classLambdasQty;
 		this.classUniqueWordsQty = classUniqueWordsQty;
+		this.project = project;
 	}
 
 	@Override
@@ -150,163 +153,4 @@ public class ClassMetric {
 				'}';
 	}
 
-	public boolean isInnerClass(){ return isInnerClass; }
-
-	public int getClassCbo() {
-		return classCbo;
-	}
-
-	public int getClassWmc() {
-		return classWmc;
-	}
-
-	public int getClassRfc() {
-		return classRfc;
-	}
-
-	public int getClassLcom() {
-		return classLcom;
-	}
-
-	public int getClassNumberOfMethods() {
-		return classNumberOfMethods;
-	}
-
-	public int getClassNumberOfStaticMethods() {
-		return classNumberOfStaticMethods;
-	}
-
-	public int getClassNumberOfPublicMethods() {
-		return classNumberOfPublicMethods;
-	}
-
-	public int getClassNumberOfPrivateMethods() {
-		return classNumberOfPrivateMethods;
-	}
-
-	public int getClassNumberOfProtectedMethods() {
-		return classNumberOfProtectedMethods;
-	}
-
-	public int getClassNumberOfDefaultMethods() {
-		return classNumberOfDefaultMethods;
-	}
-
-	public int getClassNumberOfAbstractMethods() {
-		return classNumberOfAbstractMethods;
-	}
-
-	public int getClassNumberOfFinalMethods() {
-		return classNumberOfFinalMethods;
-	}
-
-	public int getClassNumberOfSynchronizedMethods() {
-		return classNumberOfSynchronizedMethods;
-	}
-
-	public int getClassNumberOfFields() {
-		return classNumberOfFields;
-	}
-
-	public int getClassNumberOfStaticFields() {
-		return classNumberOfStaticFields;
-	}
-
-	public int getClassNumberOfPublicFields() {
-		return classNumberOfPublicFields;
-	}
-
-	public int getClassNumberOfPrivateFields() {
-		return classNumberOfPrivateFields;
-	}
-
-	public int getClassNumberOfProtectedFields() {
-		return classNumberOfProtectedFields;
-	}
-
-	public int getClassNumberOfDefaultFields() {
-		return classNumberOfDefaultFields;
-	}
-
-	public int getClassNumberOfFinalFields() {
-		return classNumberOfFinalFields;
-	}
-
-	public int getClassNumberOfSynchronizedFields() {
-		return classNumberOfSynchronizedFields;
-	}
-
-	public int getClassNosi() {
-		return classNosi;
-	}
-
-	public int getClassLoc() {
-		return classLoc;
-	}
-
-	public int getClassReturnQty() {
-		return classReturnQty;
-	}
-
-	public int getClassLoopQty() {
-		return classLoopQty;
-	}
-
-	public int getClassComparisonsQty() {
-		return classComparisonsQty;
-	}
-
-	public int getClassTryCatchQty() {
-		return classTryCatchQty;
-	}
-
-	public int getClassParenthesizedExpsQty() {
-		return classParenthesizedExpsQty;
-	}
-
-	public int getClassStringLiteralsQty() {
-		return classStringLiteralsQty;
-	}
-
-	public int getClassNumbersQty() {
-		return classNumbersQty;
-	}
-
-	public int getClassAssignmentsQty() {
-		return classAssignmentsQty;
-	}
-
-	public int getClassMathOperationsQty() {
-		return classMathOperationsQty;
-	}
-
-	public int getClassVariablesQty() {
-		return classVariablesQty;
-	}
-
-	public int getClassMaxNestedBlocks() {
-		return classMaxNestedBlocks;
-	}
-
-	public int getClassAnonymousClassesQty() {
-		return classAnonymousClassesQty;
-	}
-
-	public int getClassSubClassesQty() {
-		return classSubClassesQty;
-	}
-
-	public int getClassLambdasQty() {
-		return classLambdasQty;
-	}
-
-	public int getClassUniqueWordsQty() {
-		return classUniqueWordsQty;
-	}
-
-	public int getClassTCC() { return classTCC; }
-
-	public int getClassLCC() { return classLCC; }
-
-	public int getClassNumberOfVisibleMethods() { return classNumberOfVisibleMethods; }
 }

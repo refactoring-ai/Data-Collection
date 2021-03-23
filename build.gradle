@@ -1,0 +1,62 @@
+plugins {
+    id 'java'
+    id 'io.quarkus'
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+
+
+dependencies {
+    implementation ('org.eclipse.jdt:org.eclipse.jdt.core:3.23.0') {
+        exclude group: 'org.slf4j'
+    }
+
+    implementation ('com.github.tsantalis:refactoring-miner:2.1.0') {
+        exclude group: 'org.slf4j'
+        exclude group: "junit"
+    }
+
+    implementation 'io.quarkus:quarkus-hibernate-orm-panache'
+    implementation 'io.quarkus:quarkus-jdbc-mariadb'
+    implementation 'io.quarkus:quarkus-jgit'
+    implementation enforcedPlatform("${quarkusPlatformGroupId}:${quarkusPlatformArtifactId}:${quarkusPlatformVersion}")
+    implementation 'io.quarkus:quarkus-arc'
+    
+
+    implementation 'com.github.mauricioaniche:ck:0.6.3' 
+
+
+    implementation 'org.jboss.logmanager:log4j-jboss-logmanager:1.2.0.Final'
+    implementation 'org.jboss.logmanager:log4j2-jboss-logmanager:1.0.0.Beta1'
+    implementation 'org.jboss.slf4j:slf4j-jboss-logging:1.2.0.Final'
+    testImplementation 'io.quarkus:quarkus-junit5'
+    testImplementation 'io.quarkus:quarkus-jdbc-h2'
+    testImplementation 'org.junit.vintage:junit-vintage-engine:5.7.0'
+   
+
+}
+
+group 'refactoringml'
+version '0.1.0'
+
+compileJava {
+    options.encoding = 'UTF-8'
+    options.compilerArgs << '-parameters'
+}
+
+compileTestJava {
+    options.encoding = 'UTF-8'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+test {
+    systemProperty "java.util.logging.manager", "org.jboss.logmanager.Logger"
+}
