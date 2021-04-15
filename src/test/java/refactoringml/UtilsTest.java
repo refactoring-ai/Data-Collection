@@ -2,80 +2,65 @@ package refactoringml;
 
 import static refactoringml.util.FileUtils.isTestFile;
 
-import java.util.Random;
-
-import org.apache.commons.lang3.RandomStringUtils;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import refactoringml.util.FilePathUtils;
 import refactoringml.util.FileUtils;
 
-public class UtilsTest {
+class UtilsTest {
 	@Test
-	public void classFromFileName() {
+	void classFromFileName() {
 		Assertions.assertEquals("File", FilePathUtils.classFromFileName("/some/dir/File.java"));
 		Assertions.assertEquals("File", FilePathUtils.classFromFileName("c:\\some\\dir\\File.java"));
 		Assertions.assertEquals("File", FilePathUtils.classFromFileName("/File.java"));
 	}
 
 	@Test
-	public void classFromFullName() {
+	void classFromFullName() {
 		Assertions.assertEquals("File", FilePathUtils.classFromFullName(".some.pack.File"));
 		Assertions.assertEquals("File", FilePathUtils.classFromFullName("File"));
 	}
 
 	@Test
-	public void isJavaFile(){
-		for(int i = 0; i < 100; i++){
-			String randomString = generateRandomString();
+	void isJavaFile() {
+		String fileName = "foobar";
 
-			Assertions.assertTrue(FileUtils.isJavaFile(randomString + ".Java"));
-			Assertions.assertTrue(FileUtils.isJavaFile(randomString + ".java"));
+		Assertions.assertTrue(FileUtils.isJavaFile(fileName + ".Java"));
+		Assertions.assertTrue(FileUtils.isJavaFile(fileName + ".java"));
 
-			Assertions.assertFalse(FileUtils.isJavaFile(randomString + "Java"));
-			Assertions.assertFalse(FileUtils.isJavaFile(randomString + ".Jav"));
-			Assertions.assertFalse(FileUtils.isJavaFile(randomString + ".Java.a"));
-			Assertions.assertFalse(FileUtils.isJavaFile(randomString + "-Java"));
-		}
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + "Java"));
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + ".Jav"));
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + ".Java.a"));
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + "-Java"));
+
 	}
 
 	@Test
-	public void isTest(){
-		for(int i = 0; i < 100; i++){
-			String randomString = generateRandomString();
+	void isTest() {
+		String fileName = "foobar";
 
-			Assertions.assertTrue(isTestFile("Test" + randomString + ".java"));
-			Assertions.assertTrue(isTestFile(randomString + "/Test" + randomString + ".java"));
-			//assert ant test conventions
-			Assertions.assertTrue(isTestFile(randomString + "test.java"));
-			Assertions.assertTrue(isTestFile(randomString + "Test.java"));
+		Assertions.assertTrue(isTestFile("Test" + fileName + ".java"));
+		Assertions.assertTrue(isTestFile(fileName + "/Test" + fileName + ".java"));
+		// assert ant test conventions
+		Assertions.assertTrue(isTestFile(fileName + "test.java"));
+		Assertions.assertTrue(isTestFile(fileName + "Test.java"));
 
-			Assertions.assertFalse(isTestFile(randomString + "*est.java"));
-			Assertions.assertFalse(isTestFile(randomString + "Test.jav"));
+		Assertions.assertFalse(isTestFile(fileName + "*est.java"));
+		Assertions.assertFalse(isTestFile(fileName + "Test.jav"));
 
-			//assert maven and gradle test conventions
-			Assertions.assertTrue(isTestFile("/test/" + randomString + ".java"));
+		// assert maven and gradle test conventions
+		Assertions.assertTrue(isTestFile("/test/" + fileName + ".java"));
 
-			Assertions.assertFalse(isTestFile("/test/" + randomString + ".jav"));
-			Assertions.assertFalse(isTestFile("src/" + randomString + ".java"));
-		}
+		Assertions.assertFalse(isTestFile("/test/" + fileName + ".jav"));
+		Assertions.assertFalse(isTestFile("src/" + fileName + ".java"));
+
 	}
 
 	@Test
-	public void onlyFileName() {
+	void onlyFileName() {
 		Assertions.assertEquals("File.java", FilePathUtils.fileNameOnly("/some/dir/File.java"));
 		Assertions.assertEquals("File.java", FilePathUtils.fileNameOnly("File.java"));
 		Assertions.assertEquals("File.java", FilePathUtils.fileNameOnly("/File.java"));
-	}
-
-
-	private String generateRandomString(){
-		Random rnd = new Random();
-
-		int length = rnd.ints(0, 10).findFirst().getAsInt();
-		boolean useLetters = rnd.nextBoolean();
-		boolean useNumbers = rnd.nextBoolean();
-		return RandomStringUtils.random(length, useLetters, useNumbers);
 	}
 }
