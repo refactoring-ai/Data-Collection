@@ -76,6 +76,9 @@ public class AppBean {
 
 	Logger log = Logger.getLogger(AppBean.class);
 
+	@ConfigProperty(name = "ck.timeout.in.seconds", defaultValue = "120")
+	private Integer cKTimeoutInSeconds;
+
 	public void run(String dataset, String gitUrl, Path storagePath, Path repositoriesPath, boolean storeFullSourceCode)
 			throws GitAPIException, IOException {
 		run(dataset, gitUrl, storagePath, repositoriesPath, null, null, storeFullSourceCode);
@@ -187,6 +190,7 @@ public class AppBean {
 						new UsernamePasswordCredentialsProvider(gitUsername.get(), gitPassword.get()));
 			}
 			return command.call();
+
 		}
 	}
 
@@ -246,7 +250,8 @@ public class AppBean {
 		// commit of the repo
 		if (!isFirst(currentCommit)) {
 			long startTimeRMiner = System.currentTimeMillis();
-			miner.detectAtCommit(git.getRepository(), commitHash, handler, 120);
+			//TODO make separate timeout value for RM
+			miner.detectAtCommit(git.getRepository(), commitHash, handler, cKTimeoutInSeconds);
 			log.debug("Refactoring miner took " + (System.currentTimeMillis() - startTimeRMiner)
 					+ " milliseconds to mine the commit: " + commitHash);
 
@@ -260,7 +265,7 @@ public class AppBean {
 			// check if refactoring miner detected a refactoring we study
 			if (handler.isRefactoringToProcess() && !handler.refactoringsToProcess.isEmpty()) {
 				allRefactoringCommits = refactoringAnalyzer.collectCommitData(currentCommit, superCommitMetaData,
-						handler.refactoringsToProcess, entries);
+						handler.refactoringsToProcess, entries, cKTimeoutInSeconds);
 			}
 			// else if (handler.isRefactoringToProcess()) {
 			// // timeout happened, so count it as an exception
@@ -280,7 +285,7 @@ public class AppBean {
 				handler.refactoringsToProcess);
 		Set<ImmutablePair<String, String>> jGitRenames = getJGitRenames(entries);
 		processMetrics.collectMetrics(currentCommit, superCommitMetaData, allRefactoringCommits, entries,
-				refactoringRenames, jGitRenames, diffFormatter);
+				refactoringRenames, jGitRenames, diffFormatter, cKTimeoutInSeconds);
 		long startTimeTransaction = System.currentTimeMillis();
 		log.debug("Committing the transaction for commit " + commitHash + " took "
 				+ (System.currentTimeMillis() - startTimeTransaction) + " milliseconds.");

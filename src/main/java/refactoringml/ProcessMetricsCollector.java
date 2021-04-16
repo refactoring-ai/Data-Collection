@@ -67,14 +67,14 @@ public class ProcessMetricsCollector {
 	public void collectMetrics(RevCommit commit, CommitMetaData superCommitMetaData,
 			List<RefactoringCommit> allRefactoringCommits, List<DiffEntry> entries,
 			Set<ImmutablePair<String, String>> refactoringRenames, Set<ImmutablePair<String, String>> jGitRenames,
-			DiffFormatter diffFormatter) throws IOException {
+			DiffFormatter diffFormatter, int cKTimeoutInSeconds) throws IOException {
 		collectProcessMetricsOfRefactoredCommit(superCommitMetaData, allRefactoringCommits);
 
 		processRenames(refactoringRenames, jGitRenames, superCommitMetaData);
 
 		// we go now change by change in the commit to update the process metrics there
 		// Also if a stable instance is found it is stored with the metrics in the DB
-		collectProcessMetricsOfStableCommits(commit, superCommitMetaData, entries, diffFormatter);
+		collectProcessMetricsOfStableCommits(commit, superCommitMetaData, entries, diffFormatter, cKTimeoutInSeconds);
 	}
 
 	// Collect the ProcessMetrics of the RefactoringCommit before this commit
@@ -137,7 +137,7 @@ public class ProcessMetricsCollector {
 	// Increase the PMTracker for all class files, that were not refactored but
 	// changed on this commit
 	private void collectProcessMetricsOfStableCommits(RevCommit commit, CommitMetaData superCommitMetaData,
-			List<DiffEntry> entries, DiffFormatter diffFormatter) throws IOException {
+			List<DiffEntry> entries, DiffFormatter diffFormatter, int cKTimeoutInSeconds) throws IOException {
 		for (DiffEntry entry : entries) {
 			String fileName = enforceUnixPaths(entry.getNewPath());
 
@@ -171,7 +171,7 @@ public class ProcessMetricsCollector {
 
 			// The last commit passed the stability threshold for this class file
 			if (pmTracker.calculateStability(project.commitCountThresholdsInt)) {
-				outputNonRefactoredClass(pmTracker);
+				outputNonRefactoredClass(pmTracker, cKTimeoutInSeconds);
 
 				// we then reset the counter, and start again.
 				// it is ok to use the same class more than once, as metrics as well as
@@ -187,7 +187,7 @@ public class ProcessMetricsCollector {
 	}
 
 	// Store the refactoring instances in the DB
-	private void outputNonRefactoredClass(ProcessMetricTracker pmTracker) throws IOException {
+	private void outputNonRefactoredClass(ProcessMetricTracker pmTracker, int cKTimeoutInSeconds) throws IOException {
 		String tempDir = null;
 		try {
 			String commitBackThen = pmTracker.getBaseCommitMetaData().commitId;
@@ -211,8 +211,8 @@ public class ProcessMetricsCollector {
 			}
 
 			CommitMetaData commitMetaData = CommitMetaData.findById(pmTracker.getBaseCommitMetaData().id);
-			List<StableCommit> stableCommits = codeMetrics(commitMetaData, tempDir,
-					pmTracker.getCommitCountThreshold());
+			List<StableCommit> stableCommits = codeMetrics(commitMetaData, tempDir, pmTracker.getCommitCountThreshold(),
+					cKTimeoutInSeconds);
 
 			// print its process metrics in the same process metrics file
 			// note that we print the process metrics back then (X commits ago)
@@ -235,8 +235,8 @@ public class ProcessMetricsCollector {
 	}
 
 	// TODO: Fix this, as it generates many duplicates
-	private List<StableCommit> codeMetrics(CommitMetaData commitMetaData, String tempDir, int commitThreshold)
-			throws InterruptedException {
+	private List<StableCommit> codeMetrics(CommitMetaData commitMetaData, String tempDir, int commitThreshold,
+			int cKTimeoutInSeconds) throws InterruptedException {
 		Preconditions.checkNotNull(commitMetaData);
 		Preconditions.checkNotNull(project);
 
@@ -288,7 +288,7 @@ public class ProcessMetricsCollector {
 					enforceUnixPaths(ck.getFile()).replace(tempDir, ""), cleanedCkClassName, classMetric, null, null,
 					null, RefactoringUtils.Level.CLASS.ordinal(), commitThreshold);
 			stableCommits.add(stableCommit);
-		});
+		}, cKTimeoutInSeconds);
 
 		return stableCommits;
 	}

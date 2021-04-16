@@ -70,7 +70,7 @@ public class RefactoringAnalyzer {
 	}
 
 	public List<RefactoringCommit> collectCommitData(RevCommit commit, CommitMetaData superCommitMetaData,
-			List<Refactoring> refactoringsToProcess, List<DiffEntry> entries) {
+			List<Refactoring> refactoringsToProcess, List<DiffEntry> entries, int cKTimeoutInSeconds) {
 		List<RefactoringCommit> allRefactorings = new ArrayList<>();
 		boolean persistedCommitMetaData = false;
 
@@ -136,7 +136,7 @@ public class RefactoringAnalyzer {
 
 					// build the full RefactoringCommit object
 					RefactoringCommit refactoringCommit = buildRefactoringCommitObject(superCommitMetaData, refactoring,
-							refactoringSummary, refactoredClassName, refactoredClassFile);
+							refactoringSummary, refactoredClassName, refactoredClassFile, cKTimeoutInSeconds);
 
 					if (refactoringCommit != null) {
 						// mark it for the process metrics collection
@@ -161,7 +161,7 @@ public class RefactoringAnalyzer {
 
 	protected RefactoringCommit buildRefactoringCommitObject(CommitMetaData superCommitMetaData,
 			Refactoring refactoring, String refactoringSummary, ImmutablePair<String, String> refactoredClassNames,
-			String fileName) throws InterruptedException {
+			String fileName, int cKTimeoutInSeconds) throws InterruptedException {
 		String parentCommitId = superCommitMetaData.parentCommitId;
 
 		try {
@@ -174,7 +174,7 @@ public class RefactoringAnalyzer {
 			writeFile(tempDir + "/" + fileName, sourceCodeInPreviousVersion);
 
 			RefactoringCommit refactoringCommit = calculateCkMetrics(refactoredClassNames, superCommitMetaData,
-					refactoring, refactoringSummary);
+					refactoring, refactoringSummary, cKTimeoutInSeconds);
 			cleanTempDir(tempDir);
 
 			return refactoringCommit;
@@ -227,7 +227,7 @@ public class RefactoringAnalyzer {
 	}
 
 	private RefactoringCommit calculateCkMetrics(ImmutablePair<String, String> refactoredClasses,
-			CommitMetaData commitMetaData, Refactoring refactoring, String refactoringSummary)
+			CommitMetaData commitMetaData, Refactoring refactoring, String refactoringSummary, int cKTimeoutInSeconds)
 			throws InterruptedException {
 		final List<RefactoringCommit> refactorings = new ArrayList<>();
 		CKUtils.calculate(tempDir, commitMetaData.commitId, project.gitUrl, ck -> {
@@ -302,7 +302,7 @@ public class RefactoringAnalyzer {
 					refactoring.getRefactoringType().getDisplayName(), refactoringTypeInNumber(refactoring),
 					refactoringSummary, classMetric, methodMetrics, variableMetrics, fieldMetrics);
 			refactorings.add(refactoringCommit);
-		});
+		}, cKTimeoutInSeconds);
 
 		/**
 		 * It is possible that we did not find the class among the results of CK.
