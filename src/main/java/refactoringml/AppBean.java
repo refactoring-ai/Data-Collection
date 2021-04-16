@@ -76,7 +76,7 @@ public class AppBean {
 
 	Logger log = Logger.getLogger(AppBean.class);
 
-	@ConfigProperty(name = "cKTimeoutInSeconds", defaultValue = "120")
+	@ConfigProperty(name = "ck.timeout.in.seconds", defaultValue = "120")
 	private Integer cKTimeoutInSeconds;
 
 	public void run(String dataset, String gitUrl, Path storagePath, Path repositoriesPath, boolean storeFullSourceCode)
