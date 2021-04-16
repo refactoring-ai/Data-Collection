@@ -1,11 +1,19 @@
 # Machine Learning for Software refactoring
 [![codecov](https://codecov.io/gh/refactoring-ai/Data-Collection/branch/master/graph/badge.svg)](https://codecov.io/gh/refactoring-ai/Data-Collection)
 
-This repository contains the data-collection part on the use of machine learning methods to recommend software refactoring.
+This repository contains the data-collection part on the use of machine learning methods to recommend software refactoring that collects **refactoring** and **non-refactoring** instances from **java source code** that are later used to **train** the ML algorithms with a large variety of metrics.
 
-It currently contains the following projects:
+## Quickstart
 
-* `data-collection`: The java tool that collects **refactoring** and **non-refactoring** instances from **java source code** that are later used to **train** the ML algorithms with a large variety of metrics.
+1. Prepare a MariaDB instance and create a database with the name `refactoring_ai` (if you have docker a quick way is: `docker run -p 127.0.0.1:3306:3306 --name some-mariadb -e MYSQL_ROOT_PASSWORD=root -d mariadb` these are also the default credentials)
+2. Build jar with dependencies: `./gradlew quarkusBuild -Xtest`
+3. Define the projects to mine refactorings in `input.csv`
+4. Start mining: `java -jar java -jar build/datacollection-0.1.0-runner.jar`
+
+## Configuration
+Configuration can be done with environment variables. 
+You can also create an .env file with the variables.
+See .env.example for each variable and its explanation
 
 ## Paper and appendix 
 

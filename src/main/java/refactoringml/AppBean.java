@@ -187,6 +187,7 @@ public class AppBean {
 						new UsernamePasswordCredentialsProvider(gitUsername.get(), gitPassword.get()));
 			}
 			return command.call();
+
 		}
 	}
 

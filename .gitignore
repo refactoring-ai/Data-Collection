@@ -31,11 +31,5 @@ nb-configuration.xml
 # Gradle
 .gradle/
 build/
-repos
-cloned-repositories
 .env
-failedProjects
-storage
-projects/urls.csv
-log.log
-datacollection-0.1.0-runner.jar
+failedProjects.txt
