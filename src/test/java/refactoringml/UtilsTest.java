@@ -1,80 +1,66 @@
 package refactoringml;
 
-import org.apache.commons.lang3.RandomStringUtils;
-import org.junit.Assert;
-import org.junit.Test;
+import static refactoringml.util.FileUtils.isTestFile;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+
 import refactoringml.util.FilePathUtils;
+import refactoringml.util.FileUtils;
 
-import java.util.Random;
-
-import static refactoringml.util.FileUtils.IsJavaFile;
-import static refactoringml.util.FileUtils.IsTestFile;
-
-public class UtilsTest {
+class UtilsTest {
 	@Test
-	public void classFromFileName() {
-		Assert.assertEquals("File", FilePathUtils.classFromFileName("/some/dir/File.java"));
-		Assert.assertEquals("File", FilePathUtils.classFromFileName("c:\\some\\dir\\File.java"));
-		Assert.assertEquals("File", FilePathUtils.classFromFileName("/File.java"));
+	void classFromFileName() {
+		Assertions.assertEquals("File", FilePathUtils.classFromFileName("/some/dir/File.java"));
+		Assertions.assertEquals("File", FilePathUtils.classFromFileName("c:\\some\\dir\\File.java"));
+		Assertions.assertEquals("File", FilePathUtils.classFromFileName("/File.java"));
 	}
 
 	@Test
-	public void classFromFullName() {
-		Assert.assertEquals("File", FilePathUtils.classFromFullName(".some.pack.File"));
-		Assert.assertEquals("File", FilePathUtils.classFromFullName("File"));
+	void classFromFullName() {
+		Assertions.assertEquals("File", FilePathUtils.classFromFullName(".some.pack.File"));
+		Assertions.assertEquals("File", FilePathUtils.classFromFullName("File"));
 	}
 
 	@Test
-	public void isJavaFile(){
-		for(int i = 0; i < 100; i++){
-			String randomString = generateRandomString();
+	void isJavaFile() {
+		String fileName = "foobar";
 
-			Assert.assertTrue(IsJavaFile(randomString + ".Java"));
-			Assert.assertTrue(IsJavaFile(randomString + ".java"));
+		Assertions.assertTrue(FileUtils.isJavaFile(fileName + ".Java"));
+		Assertions.assertTrue(FileUtils.isJavaFile(fileName + ".java"));
 
-			Assert.assertFalse(IsJavaFile(randomString + "Java"));
-			Assert.assertFalse(IsJavaFile(randomString + ".Jav"));
-			Assert.assertFalse(IsJavaFile(randomString + ".Java.a"));
-			Assert.assertFalse(IsJavaFile(randomString + "-Java"));
-		}
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + "Java"));
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + ".Jav"));
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + ".Java.a"));
+		Assertions.assertFalse(FileUtils.isJavaFile(fileName + "-Java"));
+
 	}
 
 	@Test
-	public void isTest(){
-		for(int i = 0; i < 100; i++){
-			String randomString = generateRandomString();
+	void isTest() {
+		String fileName = "foobar";
 
-			Assert.assertTrue(IsTestFile("Test" + randomString + ".java"));
-			Assert.assertTrue(IsTestFile(randomString + "/Test" + randomString + ".java"));
-			//assert ant test conventions
-			Assert.assertTrue(IsTestFile(randomString + "test.java"));
-			Assert.assertTrue(IsTestFile(randomString + "Test.java"));
+		Assertions.assertTrue(isTestFile("Test" + fileName + ".java"));
+		Assertions.assertTrue(isTestFile(fileName + "/Test" + fileName + ".java"));
+		// assert ant test conventions
+		Assertions.assertTrue(isTestFile(fileName + "test.java"));
+		Assertions.assertTrue(isTestFile(fileName + "Test.java"));
 
-			Assert.assertFalse(IsTestFile(randomString + "*est.java"));
-			Assert.assertFalse(IsTestFile(randomString + "Test.jav"));
+		Assertions.assertFalse(isTestFile(fileName + "*est.java"));
+		Assertions.assertFalse(isTestFile(fileName + "Test.jav"));
 
-			//assert maven and gradle test conventions
-			Assert.assertTrue(IsTestFile("/test/" + randomString + ".java"));
+		// assert maven and gradle test conventions
+		Assertions.assertTrue(isTestFile("/test/" + fileName + ".java"));
 
-			Assert.assertFalse(IsTestFile("/test/" + randomString + ".jav"));
-			Assert.assertFalse(IsTestFile("src/" + randomString + ".java"));
-		}
+		Assertions.assertFalse(isTestFile("/test/" + fileName + ".jav"));
+		Assertions.assertFalse(isTestFile("src/" + fileName + ".java"));
+
 	}
 
 	@Test
-	public void onlyFileName() {
-		Assert.assertEquals("File.java", FilePathUtils.fileNameOnly("/some/dir/File.java"));
-		Assert.assertEquals("File.java", FilePathUtils.fileNameOnly("File.java"));
-		Assert.assertEquals("File.java", FilePathUtils.fileNameOnly("/File.java"));
-	}
-
-
-	private String generateRandomString(){
-		Random rnd = new Random();
-
-		int length = rnd.ints(0, 10).findFirst().getAsInt();
-		boolean useLetters = rnd.nextBoolean();
-		boolean useNumbers = rnd.nextBoolean();
-		return RandomStringUtils.random(length, useLetters, useNumbers);
+	void onlyFileName() {
+		Assertions.assertEquals("File.java", FilePathUtils.fileNameOnly("/some/dir/File.java"));
+		Assertions.assertEquals("File.java", FilePathUtils.fileNameOnly("File.java"));
+		Assertions.assertEquals("File.java", FilePathUtils.fileNameOnly("/File.java"));
 	}
 }

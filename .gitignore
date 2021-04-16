@@ -1,37 +1,41 @@
-.settings
-
-*.iml
-.idea/
-.DS_Store
-/target/
-.classpath
+# Eclipse
 .project
-~          
-**/repos/
-**/logs*/
-storage/
+.classpath
+.settings/
+bin/
 
-.DS_Store
-.Python
-[Bb]in
-[Ii]nclude
-[Ll]ib64
-[Ll]ocal
-pyvenv.cfg
-.venv
-pip-selfcheck.json
-*.log
+# IntelliJ
+.idea
+*.ipr
+*.iml
+*.iws
+
+# NetBeans
+nb-configuration.xml
+
+# Visual Studio Code
+.vscode
 .factorypath
 
-**/mysql/*
+# OSX
+.DS_Store
 
-.vscode/*
-!.vscode/settings.json
-!.vscode/tasks.json
-!.vscode/launch.json
-!.vscode/extensions.json
-*.code-workspace
+# Vim
+*.swp
+*.swo
 
-# Local History for Visual Studio Code
-.history/
-.vscode
+# patch
+*.orig
+*.rej
+
+# Gradle
+.gradle/
+build/
+repos
+cloned-repositories
+.env
+failedProjects
+storage
+projects/urls.csv
+log.log
+datacollection-0.1.0-runner.jar
