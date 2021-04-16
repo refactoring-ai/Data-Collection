@@ -28,17 +28,17 @@ public class PMDatabaseTest {
 
     // Test the case sensitivity of class fileNames
     // Be aware: .Java and .java are equal for java
-    @Ignore
-    @Test
-    public void caseSensitivity() {
-        PMDatabase pmDatabase = new PMDatabase();
-        pmDatabase.reportChanges("a.Java", new CommitMetaData("#1", "n", "n", "0", project), "R", 1, 1);
-        pmDatabase.reportChanges("A.Java", new CommitMetaData("#1", "n", "n", "0", project), "R", 1, 1);
-        Assertions.assertNotEquals(pmDatabase.find("a.Java"), pmDatabase.find("A.Java"));
+    // @Ignore
+    // @Test
+    // void caseSensitivity() {
+    //     PMDatabase pmDatabase = new PMDatabase();
+    //     pmDatabase.reportChanges("a.Java", new CommitMetaData("#1", "n", "n", "0", project), "R", 1, 1);
+    //     pmDatabase.reportChanges("A.Java", new CommitMetaData("#1", "n", "n", "0", project), "R", 1, 1);
+    //     Assertions.assertNotEquals(pmDatabase.find("a.Java"), pmDatabase.find("A.Java"));
 
-        pmDatabase.reportChanges("a.java", new CommitMetaData("#2", "n", "n", "0", project), "R", 1, 1);
-        Assertions.assertEquals(pmDatabase.find("a.Java"), pmDatabase.find("a.java"));
-    }
+    //     pmDatabase.reportChanges("a.java", new CommitMetaData("#2", "n", "n", "0", project), "R", 1, 1);
+    //     Assertions.assertEquals(pmDatabase.find("a.Java"), pmDatabase.find("a.java"));
+    // }
 
     @Test
     public void reportChanges() {

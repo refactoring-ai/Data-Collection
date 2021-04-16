@@ -17,7 +17,6 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -26,11 +25,11 @@ import refactoringml.AppBean;
 import refactoringml.db.Project;
 
 /*
-    Test if a project can be added twice to a database both for the Single and Queue version of the data collection.
+     Test if a project can be added twice to a database both for the Single and Queue version of the data collection.
  */
 @QuarkusTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class DatabaseProjectTest {
+class DatabaseProjectTest {
     private final String repo1 = "https://github.com/refactoring-ai-testing/toyrepo-r1.git";
     private final String repo2 = "https://github.com/refactoring-ai-testing/toyrepo-r2.git";
 
@@ -49,32 +48,23 @@ public class DatabaseProjectTest {
 
     @AfterEach
     void resetTests() {
-        deleteProject(repo1);
-        deleteProject(repo2);
+        deleteProjects(repo1);
+        deleteProjects(repo2);
     }
 
     @AfterAll
-    protected void cleanTests() throws IOException, InterruptedException {
-        deleteProject(repo1);
-        deleteProject(repo2);
+    void cleanTests() throws IOException, InterruptedException {
+        // deleteProjects(repo1);
+        // deleteProjects(repo2);
         FileUtils.deleteDirectory(new File(tmpDir));
         FileUtils.deleteDirectory(outputDir.toFile());
     }
 
     @Transactional
-    protected void deleteProject(String repo) {
-        try {
-
-            List<Project> projects = Project.list("gitUrl", repo);
-
-            for (Project project : projects) {
-                project.delete();
-            }
-
-        } catch (Exception e) {
-            System.out.println("Could not delete the project before starting the test");
-            e.printStackTrace();
-            throw e;
+    void deleteProjects(String repo) {
+        List<Project> projects = Project.list("gitUrl", repo);
+        for (Project project : projects) {
+            project.delete();
         }
     }
 
@@ -82,16 +72,16 @@ public class DatabaseProjectTest {
      * Test if two different projects are processed.
      */
     @Test
-    public void different() throws Exception {
-        appBean.run("repo1", repo1, outputDir, Files.createTempDirectory(null), false);
-        appBean.run("repo2", repo2, outputDir, Files.createTempDirectory(null), false);
+    void different() throws Exception {
+        appBean.run("repo1diff", repo1, outputDir, Files.createTempDirectory(null), false);
+        appBean.run("repo2diff", repo2, outputDir, Files.createTempDirectory(null), false);
     }
 
     /*
      * Test if the same project is not processed twice.
      */
     @Test
-    public void twice() throws Exception {
+    void twice() throws Exception {
         appBean.run("repo1", repo1, outputDir, Files.createTempDirectory(null), false);
 
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
@@ -108,8 +98,7 @@ public class DatabaseProjectTest {
      * might be there already...
      */
     @Test
-    @Disabled
-    public void alternating() throws Exception {
+    void alternating() throws Exception {
         appBean.run("repo1", repo1, outputDir, Files.createTempDirectory(null), false);
         appBean.run("repo2", repo2, outputDir, Files.createTempDirectory(null), false);
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {

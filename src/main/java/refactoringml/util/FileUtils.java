@@ -48,8 +48,8 @@ public class FileUtils {
 		return fileName.toLowerCase().endsWith(".java");
 	}
 
-	public static String createTmpDir() {
-		String rawTempDir = com.google.common.io.Files.createTempDir().getAbsolutePath();
+	public static String createTmpDir() throws IOException {
+		String rawTempDir = Files.createTempDirectory(null).toFile().getAbsolutePath();
 		return lastSlashDir(rawTempDir);
 	}
 

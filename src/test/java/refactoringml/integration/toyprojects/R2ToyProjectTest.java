@@ -74,7 +74,7 @@ public class R2ToyProjectTest extends IntegrationBaseTest {
 	public void commitMetaData() {
 		String commit = "bc15aee7cfaddde19ba6fefe0d12331fe98ddd46";
 		assertMetaDataRefactoring(commit, "rename class", "Rename Class\tPerson renamed to People",
-				"@local/repos/toyrepo-r2/" + commit, 2, "d56acf6b23d646528b4b04779b0fe64d74811052");
+				"@local//tmp/toyrepo-r2/" + commit, 2, "d56acf6b23d646528b4b04779b0fe64d74811052");
 	}
 
 	@Test

@@ -19,8 +19,8 @@ import org.jboss.logging.Logger;
 import io.quarkus.runtime.QuarkusApplication;
 import refactoringml.util.FileUtils;
 
-public class DataCollecter implements QuarkusApplication {
-    private static final Logger log = Logger.getLogger(DataCollecter.class);
+public class DataCollector implements QuarkusApplication {
+    private static final Logger log = Logger.getLogger(DataCollector.class);
 
     @ConfigProperty(name = "repositories.path", defaultValue = "repositories")
     Path repositoriesPath;
@@ -28,7 +28,7 @@ public class DataCollecter implements QuarkusApplication {
     @ConfigProperty(name = "storage.path", defaultValue = "storage")
     Path storagePath;
 
-    @ConfigProperty(name = "input.csv.file")
+    @ConfigProperty(name = "input.csv.file", defaultValue = "input.csv")
     Path inputCsvFile;
 
     @ConfigProperty(name = "failed.projects.file", defaultValue = "failedProjects")
@@ -46,16 +46,13 @@ public class DataCollecter implements QuarkusApplication {
     @Override
     public int run(String... args) throws Exception {
         ThreadPoolExecutor tp = (ThreadPoolExecutor) Executors.newFixedThreadPool(threadCount);
-        log.info("test");
         tp.setCorePoolSize(threadCount);
         List<RepoProcesser> tasks;
         try (Stream<String> stream = Files.lines(inputCsvFile)) {
             tasks = stream.map(this::processorFromLine).collect(Collectors.toList());
         }
         tp.invokeAll(tasks);
-
         tp.shutdown();
-
         return 0;
     }
 

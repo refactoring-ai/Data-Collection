@@ -15,8 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,6 +25,7 @@ import javax.transaction.Transactional;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
@@ -37,7 +38,6 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 import org.eclipse.microprofile.config.inject.ConfigProperty;
 import org.jboss.logging.Logger;
-import org.refactoringminer.RefactoringMiner;
 import org.refactoringminer.api.GitHistoryRefactoringMiner;
 import org.refactoringminer.api.Refactoring;
 import org.refactoringminer.api.RefactoringHandler;
@@ -57,27 +57,24 @@ import refactoringml.util.RefactoringUtils;
 @ApplicationScoped
 public class AppBean {
 
-	@ConfigProperty(name = "gitlab.access.token")
-	String gitlabAccessToken;
+	@ConfigProperty(name = "git.username")
+	Optional<String> gitUsername;
 
-	public void setStableCommitThresholds(String thresholds) {
-		stableCommitThresholds = thresholds;
+	@ConfigProperty(name = "git.password")
+	Optional<String> gitPassword;
+
+	// TODO needed for tests --- refactor tests to define it more stable
+	/**
+	 * @param stableCommitThresholds the stableCommitThresholds to set
+	 */
+	public void setStableCommitThresholds(String stableCommitThresholds) {
+		this.stableCommitThresholds = stableCommitThresholds;
 	}
 
-	@ConfigProperty(name = "stable.commit.thresholds", defaultValue = "20")
+	@ConfigProperty(name = "stable.commit.thresholds", defaultValue = "20,50")
 	String stableCommitThresholds;
 
 	Logger log = Logger.getLogger(AppBean.class);
-
-	@Transactional
-	public void persistAndFlushInTransaction(Project project) {
-		project.persistAndFlush();
-	}
-
-	@Transactional
-	public void mergeInTransaction(Project project) {
-		project.merge();
-	}
 
 	public void run(String dataset, String gitUrl, Path storagePath, Path repositoriesPath, boolean storeFullSourceCode)
 			throws GitAPIException, IOException {
@@ -97,10 +94,10 @@ public class AppBean {
 				: repositoriesPath.resolve(extractProjectNameFromGitUrl(gitUrl)));
 
 		// do not run if the project is already in the database
-		// if (Project.projectExists(gitUrl)) {
-		// String message = String.format("Project %s already in the database", gitUrl);
-		// throw new IllegalArgumentException(message);
-		// }
+		if (Project.projectExists(gitUrl)) {
+			String message = String.format("Project %s already in the database", gitUrl);
+			throw new IllegalArgumentException(message);
+		}
 
 		long startProjectTime = System.currentTimeMillis();
 		// creates the directory in the storage
@@ -108,7 +105,7 @@ public class AppBean {
 			Files.createDirectories(filesStoragePath);
 		}
 
-		var git = initGitRepository(clonePath, gitUrl);
+		Git git = initGitRepository(clonePath, gitUrl);
 		String mainBranch = discoverMainBranch(git);
 
 		Project project = initProject(clonePath, git, gitUrl, datasetName);
@@ -180,18 +177,17 @@ public class AppBean {
 	// Initialize the git repository for this run, by downloading it
 	// Returns the jgit repository object and the git object
 	private Git initGitRepository(Path clonePath, String gitUrl) throws GitAPIException, IOException {
-		Git git;
 		try {
-			git = Git.open(clonePath.resolve(".git").toFile());
+			return Git.open(clonePath.resolve(".git").toFile());
 		} catch (RepositoryNotFoundException rnfe) {
-
-			git = Git.cloneRepository().setCloneAllBranches(true).setDirectory(clonePath.toFile()).setURI(gitUrl)
-					.setCredentialsProvider(new UsernamePasswordCredentialsProvider("BV52FK", gitlabAccessToken))
-					.call();
+			CloneCommand command = Git.cloneRepository().setCloneAllBranches(true).setDirectory(clonePath.toFile())
+					.setURI(gitUrl);
+			if (gitUsername.isPresent() && gitPassword.isPresent()) {
+				command.setCredentialsProvider(
+						new UsernamePasswordCredentialsProvider(gitUsername.get(), gitPassword.get()));
+			}
+			return command.call();
 		}
-
-		// identifies the main branch of that repo
-		return git;
 	}
 
 	// Initialize the project object for this run
@@ -321,7 +317,7 @@ public class AppBean {
 			}
 
 			refactoringsToProcess = refactoringsToProcess.stream()
-					.filter(r -> REFACTORINGMINER_1_TYPES.contains(r.getRefactoringType()))
+					// .filter(r -> REFACTORINGMINER_1_TYPES.contains(r.getRefactoringType()))
 					.collect(Collectors.toList());
 			return !refactoringsToProcess.isEmpty();
 		}
@@ -367,5 +363,15 @@ public class AppBean {
 		}
 		statistics.append("\n").append(project.toString());
 		log.info(statistics);
+	}
+
+	@Transactional
+	public void persistAndFlushInTransaction(Project project) {
+		project.persistAndFlush();
+	}
+
+	@Transactional
+	public void mergeInTransaction(Project project) {
+		project.merge();
 	}
 }

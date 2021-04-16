@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
@@ -16,7 +15,6 @@ import refactoringml.integration.IntegrationBaseTest;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @QuarkusTest
 
-@Disabled // still need to manually validate this one
 public class ApacheCommonsLangIntegrationTest extends IntegrationBaseTest {
     @Override
     protected String getLastCommit() {
@@ -68,8 +66,8 @@ public class ApacheCommonsLangIntegrationTest extends IntegrationBaseTest {
                 commit -> commit.filePath.equals("src/java/org/apache/commons/lang/builder/HashCodeBuilder.java"))
                 .collect(Collectors.toList());
 
-        Assertions.assertEquals(4, stableCommitList.size());
-        Assertions.assertEquals(8, refactoringCommitList.size());
+        Assertions.assertEquals(2, stableCommitList.size());
+        Assertions.assertEquals(20, refactoringCommitList.size());
 
         Assertions.assertEquals("5c40090fecdacd9366bba7e3e29d94f213cf2633", stableCommitList.get(0).getCommit());
 
@@ -80,13 +78,13 @@ public class ApacheCommonsLangIntegrationTest extends IntegrationBaseTest {
 
         // It appears 3 times
         Assertions.assertEquals("379d1bcac32d75e6c7f32661b2203f930f9989df", stableCommitList.get(1).getCommit());
-        Assertions.assertEquals("d3c425d6f1281d9387f5b80836ce855bc168453d", stableCommitList.get(2).getCommit());
-        Assertions.assertEquals("3ed99652c84339375f1e6b99bd9c7f71d565e023", stableCommitList.get(3).getCommit());
+        // Assertions.assertEquals("d3c425d6f1281d9387f5b80836ce855bc168453d", stableCommitList.get(2).getCommit());
+        // Assertions.assertEquals("3ed99652c84339375f1e6b99bd9c7f71d565e023", stableCommitList.get(3).getCommit());
     }
 
     // check the number of test and production files as well as their LOC
     @Test
-    public void projectMetrics() {
-        assertProjectMetrics(340, 161, 179, 78054, 28422, 49632);
+    void projectMetrics() {
+        assertProjectMetrics(403, 216, 187, 85053, 29836, 55217);
     }
 }

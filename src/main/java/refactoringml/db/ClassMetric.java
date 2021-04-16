@@ -1,6 +1,13 @@
 package refactoringml.db;
 
-import javax.persistence.*;
+import java.util.Collection;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 
@@ -51,18 +58,32 @@ public class ClassMetric extends PanacheEntity {
 	public int classLambdasQty;
 	public int classUniqueWordsQty;
 
-	@ManyToOne(cascade = CascadeType.REMOVE)
 	@JoinColumn(nullable = false)
+	@ManyToOne
 	public Project project;
 
-	@Deprecated // hibernate purposes
-	public ClassMetric(){}
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "classMetrics", targetEntity = RefactoringCommit.class)
+	public Collection<Instance> instances;
 
-	public ClassMetric(boolean isInnerClass, int classCbo, int classWmc, int classRfc, int classLcom, float classTCC, float classLCC, int classNumberOfMethods, int classNumberOfStaticMethods, int classNumberOfPublicMethods, int classNumberOfPrivateMethods, int classNumberOfProtectedMethods,
-	                   int classNumberOfDefaultMethods, int classNumberOfVisibleMethods, int classNumberOfAbstractMethods, int classNumberOfFinalMethods, int classNumberOfSynchronizedMethods, int classNumberOfFields, int classNumberOfStaticFields,
-	                   int classNumberOfPublicFields, int classNumberOfPrivateFields, int classNumberOfProtectedFields, int classNumberOfDefaultFields, int classNumberOfFinalFields, int classNumberOfSynchronizedFields,
-	                   int classNosi, int classLoc, int classReturnQty, int classLoopQty, int classComparisonsQty, int classTryCatchQty, int classParenthesizedExpsQty, int classStringLiteralsQty, int classNumbersQty, int classAssignmentsQty,
-	                   int classMathOperationsQty, int classVariablesQty, int classMaxNestedBlocks, int classAnonymousClassesQty, int classSubClassesQty, int classLambdasQty, int classUniqueWordsQty, Project project) {
+	// @OneToOne(cascade = CascadeType.ALL, mappedBy = "classMetrics")
+	// public Collection<Sta> refactoringCommits;
+
+	@Deprecated // hibernate purposes
+	public ClassMetric() {
+	}
+
+	public ClassMetric(boolean isInnerClass, int classCbo, int classWmc, int classRfc, int classLcom, float classTCC,
+			float classLCC, int classNumberOfMethods, int classNumberOfStaticMethods, int classNumberOfPublicMethods,
+			int classNumberOfPrivateMethods, int classNumberOfProtectedMethods, int classNumberOfDefaultMethods,
+			int classNumberOfVisibleMethods, int classNumberOfAbstractMethods, int classNumberOfFinalMethods,
+			int classNumberOfSynchronizedMethods, int classNumberOfFields, int classNumberOfStaticFields,
+			int classNumberOfPublicFields, int classNumberOfPrivateFields, int classNumberOfProtectedFields,
+			int classNumberOfDefaultFields, int classNumberOfFinalFields, int classNumberOfSynchronizedFields,
+			int classNosi, int classLoc, int classReturnQty, int classLoopQty, int classComparisonsQty,
+			int classTryCatchQty, int classParenthesizedExpsQty, int classStringLiteralsQty, int classNumbersQty,
+			int classAssignmentsQty, int classMathOperationsQty, int classVariablesQty, int classMaxNestedBlocks,
+			int classAnonymousClassesQty, int classSubClassesQty, int classLambdasQty, int classUniqueWordsQty,
+			Project project) {
 		this.isInnerClass = isInnerClass;
 		this.classCbo = classCbo;
 		this.classWmc = classWmc;
@@ -110,47 +131,28 @@ public class ClassMetric extends PanacheEntity {
 
 	@Override
 	public String toString() {
-		return "ClassMetric{" +
-				"isInnerClass=" + isInnerClass +
-				", classCbo=" + classCbo +
-				", classWmc=" + classWmc +
-				", classRfc=" + classRfc +
-				", classLcom=" + classLcom +
-				", classNumberOfMethods=" + classNumberOfMethods +
-				", classNumberOfStaticMethods=" + classNumberOfStaticMethods +
-				", classNumberOfPublicMethods=" + classNumberOfPublicMethods +
-				", classNumberOfPrivateMethods=" + classNumberOfPrivateMethods +
-				", classNumberOfProtectedMethods=" + classNumberOfProtectedMethods +
-				", classNumberOfDefaultMethods=" + classNumberOfDefaultMethods +
-				", classNumberOfAbstractMethods=" + classNumberOfAbstractMethods +
-				", classNumberOfFinalMethods=" + classNumberOfFinalMethods +
-				", classNumberOfSynchronizedMethods=" + classNumberOfSynchronizedMethods +
-				", classNumberOfFields=" + classNumberOfFields +
-				", classNumberOfStaticFields=" + classNumberOfStaticFields +
-				", classNumberOfPublicFields=" + classNumberOfPublicFields +
-				", classNumberOfPrivateFields=" + classNumberOfPrivateFields +
-				", classNumberOfProtectedFields=" + classNumberOfProtectedFields +
-				", classNumberOfDefaultFields=" + classNumberOfDefaultFields +
-				", classNumberOfFinalFields=" + classNumberOfFinalFields +
-				", classNumberOfSynchronizedFields=" + classNumberOfSynchronizedFields +
-				", classNosi=" + classNosi +
-				", classLoc=" + classLoc +
-				", classReturnQty=" + classReturnQty +
-				", classLoopQty=" + classLoopQty +
-				", classComparisonsQty=" + classComparisonsQty +
-				", classTryCatchQty=" + classTryCatchQty +
-				", classParenthesizedExpsQty=" + classParenthesizedExpsQty +
-				", classStringLiteralsQty=" + classStringLiteralsQty +
-				", classNumbersQty=" + classNumbersQty +
-				", classAssignmentsQty=" + classAssignmentsQty +
-				", classMathOperationsQty=" + classMathOperationsQty +
-				", classVariablesQty=" + classVariablesQty +
-				", classMaxNestedBlocks=" + classMaxNestedBlocks +
-				", classAnonymousClassesQty=" + classAnonymousClassesQty +
-				", classSubClassesQty=" + classSubClassesQty +
-				", classLambdasQty=" + classLambdasQty +
-				", classUniqueWordsQty=" + classUniqueWordsQty +
-				'}';
+		return "ClassMetric{" + "isInnerClass=" + isInnerClass + ", classCbo=" + classCbo + ", classWmc=" + classWmc
+				+ ", classRfc=" + classRfc + ", classLcom=" + classLcom + ", classNumberOfMethods="
+				+ classNumberOfMethods + ", classNumberOfStaticMethods=" + classNumberOfStaticMethods
+				+ ", classNumberOfPublicMethods=" + classNumberOfPublicMethods + ", classNumberOfPrivateMethods="
+				+ classNumberOfPrivateMethods + ", classNumberOfProtectedMethods=" + classNumberOfProtectedMethods
+				+ ", classNumberOfDefaultMethods=" + classNumberOfDefaultMethods + ", classNumberOfAbstractMethods="
+				+ classNumberOfAbstractMethods + ", classNumberOfFinalMethods=" + classNumberOfFinalMethods
+				+ ", classNumberOfSynchronizedMethods=" + classNumberOfSynchronizedMethods + ", classNumberOfFields="
+				+ classNumberOfFields + ", classNumberOfStaticFields=" + classNumberOfStaticFields
+				+ ", classNumberOfPublicFields=" + classNumberOfPublicFields + ", classNumberOfPrivateFields="
+				+ classNumberOfPrivateFields + ", classNumberOfProtectedFields=" + classNumberOfProtectedFields
+				+ ", classNumberOfDefaultFields=" + classNumberOfDefaultFields + ", classNumberOfFinalFields="
+				+ classNumberOfFinalFields + ", classNumberOfSynchronizedFields=" + classNumberOfSynchronizedFields
+				+ ", classNosi=" + classNosi + ", classLoc=" + classLoc + ", classReturnQty=" + classReturnQty
+				+ ", classLoopQty=" + classLoopQty + ", classComparisonsQty=" + classComparisonsQty
+				+ ", classTryCatchQty=" + classTryCatchQty + ", classParenthesizedExpsQty=" + classParenthesizedExpsQty
+				+ ", classStringLiteralsQty=" + classStringLiteralsQty + ", classNumbersQty=" + classNumbersQty
+				+ ", classAssignmentsQty=" + classAssignmentsQty + ", classMathOperationsQty=" + classMathOperationsQty
+				+ ", classVariablesQty=" + classVariablesQty + ", classMaxNestedBlocks=" + classMaxNestedBlocks
+				+ ", classAnonymousClassesQty=" + classAnonymousClassesQty + ", classSubClassesQty="
+				+ classSubClassesQty + ", classLambdasQty=" + classLambdasQty + ", classUniqueWordsQty="
+				+ classUniqueWordsQty + '}';
 	}
 
 }

@@ -19,6 +19,9 @@ public class Project extends PanacheEntity {
 	public String gitUrl;
 	public String projectName;
 
+	@OneToMany(cascade = CascadeType.ALL, mappedBy = "project")
+	public Collection<ClassMetric> classMetrics;
+
 	@Temporal(TemporalType.TIMESTAMP)
 	public Calendar dateOfProcessing;
 
@@ -53,7 +56,6 @@ public class Project extends PanacheEntity {
 
 	// does the project have a remote origin, or is it a local one?
 	public boolean isLocal;
-
 
 	public Project() {
 	}
@@ -107,5 +109,4 @@ public class Project extends PanacheEntity {
 	public void merge() {
 		getEntityManager().merge(this);
 	}
-
 }
